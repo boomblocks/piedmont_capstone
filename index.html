@@ -8,9 +8,30 @@
 		<div class="header">
 			<button id=test onclick="Test();">Test</button>
 			<button id=test onclick="lava();">Lava!</button>
+			<button id='play' onclick="Play();">Play Sound</button>
 			<p id= >header</p>
 		</div>
 		<div id="toybox">
 		</div>
+		<script>
+			function lava(){
+				interv = setInterval(lava_act, 500);
+			}
+			function lava_act() {
+				//it begins to accelerate?? when buttons are added...?
+				for (c in all_buttons){
+					console.log(all_buttons[c]);
+					if (!(all_buttons[c] === null)){
+						document.getElementById(all_buttons[c]).style.backgroundColor = `hsl(${colors['A']}, 100%, 50%)`;
+						shuffle_colors();
+					}
+				}
+			}
+			function Play(){
+				let sound = new Audio("./audio/mixkit-fast-blow-2144.wav");
+				sound.play();
+			}
+		</script>
+		<audio src="./audio/mixkit-fast-blow-2144.wav"></audio>
 	</body>
 </html>
