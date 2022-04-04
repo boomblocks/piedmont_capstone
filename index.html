@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html>
 	<head>
+		<!--<script type="module" src="./js/nodejs/node_modules/npm/index.js"></script>-->
 		<script src="./js/index.js"></script>
+		<script src="./js/audio_handling.js"></script>
 		<link href="./css/fresh.css" rel="stylesheet">
 	</head>
 	<body>
@@ -15,23 +17,38 @@
 		</div>
 		<script>
 			function lava(){
-				interv = setInterval(lava_act, 500);
-			}
-			function lava_act() {
-				//it begins to accelerate?? when buttons are added...?
-				for (c in all_buttons){
-					console.log(all_buttons[c]);
-					if (!(all_buttons[c] === null)){
-						document.getElementById(all_buttons[c]).style.backgroundColor = `hsl(${colors['A']}, 100%, 50%)`;
-						shuffle_colors();
+				if (!(TestClicked)){
+					TestClicked = true;
+					lava_act();
+				} else {
+					TestClicked = false;
+					for (c in all_buttons){
+						all_buttons[c].style.backgroundColor = button_history.get(all_buttons[c])['color'];
 					}
 				}
 			}
-			function Play(){
-				let sound = new Audio("./audio/mixkit-fast-blow-2144.wav");
-				sound.play();
+			function lava_act() {
+				for (c in all_buttons){
+					console.log(all_buttons[c]);
+					if (!(all_buttons[c] === null)){
+						//let channel = button_history.get(all_buttons[c])['channel']
+						all_buttons[c].style.backgroundColor = 'red';
+						//button_history.set(all_buttons[c], {color: 'red', channel: channel});
+					}
+				}
+			}
+			function Play(button){
+				console.log(button_history.get(button)['quiet_bool']);
+				if (!(button_history.get(button)['quiet_bool'])){
+					let sound = new Audio(soundfile[increment]);
+					sound.play();
+					console.log(soundfile[increment]);
+					increment++;
+					if (increment >= soundfile.length){
+						increment = 0;
+					}
+				}
 			}
 		</script>
-		<audio src="./audio/mixkit-fast-blow-2144.wav"></audio>
 	</body>
 </html>
