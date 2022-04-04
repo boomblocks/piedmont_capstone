@@ -13,7 +13,13 @@
 			<button id='play' onclick="Play();">Play Sound</button>
 			<p id= >header</p>
 		</div>
-		<div id="toybox">
+		<div id="toybox1">
+		</div>
+		<div id="container">
+			<div id="toybox2">
+			</div>
+			<div id="toybox3">
+			</div>
 		</div>
 		<script>
 			function lava(){
@@ -24,12 +30,13 @@
 					TestClicked = false;
 					for (c in all_buttons){
 						all_buttons[c].style.backgroundColor = button_history.get(all_buttons[c])['color'];
+						
 					}
 				}
 			}
 			function lava_act() {
 				for (c in all_buttons){
-					console.log(all_buttons[c]);
+					//console.log(all_buttons[c]);
 					if (!(all_buttons[c] === null)){
 						//let channel = button_history.get(all_buttons[c])['channel']
 						all_buttons[c].style.backgroundColor = 'red';
@@ -38,11 +45,9 @@
 				}
 			}
 			function Play(button){
-				console.log(button_history.get(button)['quiet_bool']);
 				if (!(button_history.get(button)['quiet_bool'])){
 					let sound = new Audio(soundfile[increment]);
 					sound.play();
-					console.log(soundfile[increment]);
 					increment++;
 					if (increment >= soundfile.length){
 						increment = 0;

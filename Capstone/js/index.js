@@ -2,8 +2,11 @@ var TestClicked = false;
 var interv = null;
 var colors = {'A':(360/7), 'B':(360/7) * 2, 'C':(360/7) * 3, 'D':(360/7) * 4, 'E':(360/7) * 5, 'F':(360/7) * 6, 'G':0};
 var all_buttons = [null];
+var all_channels = [null];
+var all_synths = [null];
 var button_history = new Map(); // elements are map.get(button) = {color; channel; quiet_bool}
-var channel_history = new Map(); //elements are map.get(channel)= {volume; synth_bool; soundfile; synth}
+var channel_history = new Map(); //elements are map.get(channel)= {name; volume; synth_bool; soundfile; synth}
+var synth_history = new Map(); //elements are map.get(synth)= {volume; wave-shape; frequency}
 var increment = 0;
 var	soundfile = ["./audio/Ahh!_1.wav",
 		"./audio/Am_Chord_1.wav",
@@ -30,6 +33,7 @@ var	soundfile = ["./audio/Ahh!_1.wav",
 
 function Test(){
 	createButton();
+	createChannel();
 	shuffle_colors();
 	
 }
@@ -62,7 +66,7 @@ function createButton(){
 	//button.addEventListener('mousedown', function () {deleteThis(button.id, button)}, false);
 	button.addEventListener("touchstart", function () {Play(button)}, false);
 	button.addEventListener('mousedown', function () {Play(button)}, false);
-	document.getElementById("toybox").appendChild(button);
+	document.getElementById("toybox1").appendChild(button);
 	
 	//make edit button
 	let edit_button = document.createElement('div');
@@ -70,7 +74,7 @@ function createButton(){
 	edit_button.style.backgroundColor = 'hsl(127, 50%, 50%)';
 	edit_button.style.height = '12px';
 	edit_button.style.width = '12px';
-	edit_button.style.float = 'right';
+	edit_button.style.float = 'left';
 	edit_button.addEventListener('mousedown', function () {editMenu(button)}, false);
 	
 	button.appendChild(edit_button);
@@ -96,6 +100,7 @@ function editMenu(button){
 	delete_button.style.backgroundColor = 'hsl(0, 50%, 50%)';
 	delete_button.style.height = '12px';
 	delete_button.style.width = '12px';
+	delete_button.style.float = 'right';
 	delete_button.id = button.id + 'd';
 	delete_button.addEventListener('mousedown', function () {deleteThis(button.id, button)}, false);
 	button.appendChild(delete_button);
@@ -114,7 +119,7 @@ function editMenu(button){
 	color_select.style.margin = '10px';
 	color_select.style.float = 'centered';
 	color_select.addEventListener("change", function() {
-		console.log(`${color_select.value}`); button_history.set(button, {color:color_select.value, channel: channel, quiet_bool:true});}, false);
+		button_history.set(button, {color:color_select.value, channel: channel, quiet_bool:true});}, false);
 	button.appendChild(color_select);
 	
 	//make channel select
@@ -131,7 +136,7 @@ function editMenu(button){
 		edit_button.style.backgroundColor = 'hsl(127, 50%, 50%)';
 		edit_button.style.height = '12px';
 		edit_button.style.width = '12px';
-		edit_button.style.float = 'right';
+		edit_button.style.float = 'left';
 		edit_button.addEventListener('mousedown', function () {editMenu(button)}, false);
 		button.appendChild(edit_button);
 		color = button_history.get(button)['color'];
@@ -141,8 +146,6 @@ function editMenu(button){
 		setTimeout(function(){button.removeChild(exit)},1);
 	}
 	button.appendChild(exit);
-		
-	
 }
 
 function stringToHsl(string){
@@ -185,11 +188,9 @@ function hslToRGB(array) {
 }
 
 function RGBtoHex(array){
-	console.log(`lastly...${array}`);
 	let r = array[0].toString(16);
 	let g = array[1].toString(16);
 	let b = array[2].toString(16);
-	console.log(`r=${r}...g=${g}...b=${b}`);
 	if (r.length == 1){
 		r = '0' + r;
 	} if (g.length == 1){
@@ -203,4 +204,43 @@ function RGBtoHex(array){
 function shuffle_colors(){
 	colors = {'A':colors["B"], 'B':colors["C"], 'C':colors["D"], 'D':colors["E"],
 		'E':colors["F"], 'F':colors["G"], 'G':colors["A"]};
+}
+
+function createChannel(){
+	let channel = document.createElement('div');
+	let cs = channel.style;
+	let array_position = NextNull(all_channels);
+	channel.id = "channel"+array_position.toString();
+	all_channels[array_position] = channel;
+	//channel_history.set(channel, {name; volume; synth_bool; soundfile; synth});
+	//button.style = `background-color:${color}; height: 125px; width:125px; border:1px solid black`;
+	cs.border= '1px solid black';
+	cs.backgroundColor = '#eeeeee';
+	cs.height = '120px';
+	cs.width = '100%';
+	cs.margin = '0 0 0 0';
+	cs.display = 'block';
+	cs.float = 'left';
+	document.getElementById("toybox2").appendChild(channel);
+	
+	//make delete button
+	let delete_button = document.createElement('div');
+	delete_button.style.backgroundColor = 'hsl(0, 50%, 50%)';
+	delete_button.style.height = '12px';
+	delete_button.style.width = '12px';
+	delete_button.id = channel.id + 'd';
+	delete_button.addEventListener('mousedown', function () {document.getElementById("toybox2").removeChild(channel);}, false);
+	channel.appendChild(delete_button);
+	
+	
+	
+	//make volume control
+	//I AM NOT HAPPY WITH CURRENT IMPLEMENTATION
+	channel.innerHTML+=`<div class="left"><span>Volume: </span><input type="range" min="0.0" max="1.0" step="0.01" value="0.5" list="volumes" name="volume"><datalist id="volumes"><option value="0.0" label="Mute"><option value="1.0" label="100%"></datalist></div>`;
+	
+	//make radio buttons
+	let knobs = document.createElement('input');
+	knobs.type = 'radio';
+	
+	
 }
