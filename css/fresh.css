@@ -1,12 +1,39 @@
-#toybox {
+#toybox1 {
 	border: solid;
 	overflow: auto;
 	overflow-wrap: normal;
-	width: 1000px;
+	width: 75%;
 	height: 400px;
 	resize: height;
-	margin: 5px;
-	left: 0;
+	margin: auto;
+}
+
+#toybox2 {
+	border: solid;
+	overflow: auto;
+	overflow-wrap: normal;
+	width: 49%;
+	height: 400px;
+	resize: height;
+	margin: 0 0 0 0;
+	display: inline-block;
+}
+
+#toybox3 {
+	border: solid;
+	overflow: auto;
+	overflow-wrap: normal;
+	width: 49%;
+	height: 400px;
+	resize: height;
+	margin: 0 0 0 0;
+	display: inline-block;
+}
+#container {
+	margin: auto;
+	border: 5px solid orange;
+	width: 75%;
+	display:block;
 }
 
 #editbox{
