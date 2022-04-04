@@ -5,7 +5,7 @@ var all_buttons = [null];
 var all_channels = [null];
 var all_synths = [null];
 var button_history = new Map(); // elements are map.get(button) = {color; channel; quiet_bool}
-var channel_history = new Map(); //elements are map.get(channel)= {name; volume; synth_bool; soundfile; synth}
+var channel_history = new Map(); //elements are map.get(channel)= {label; volume; synth_bool; soundfile(null); synth(null)}
 var synth_history = new Map(); //elements are map.get(synth)= {volume; wave-shape; frequency}
 var increment = 0;
 var	soundfile = ["./audio/Ahh!_1.wav",
@@ -260,26 +260,75 @@ function createChannel(){
 	let left_column_top_left = document.createElement('div'); //will have radio button for synth
 	let left_column_top_right = document.createElement('div'); //will have radio button for soundfile
 	
-	channel.id = '0' //extremely temporary!!
+	//first, handle channel object stuff
+	channel.style.height = '30%';
+	channel.style.width = '100%';
+	channel.style.overflow = 'hidden';
+	let array_position = NextNull(all_channels);
+	channel.id = 'channel'+array_position.toString();
+	all_channels[array_position] = channel;
+	
+	banner.style.height = '20%';
+	banner.style.width = '100%';
+	banner.style.display = 'flex';
+	
+	
+	body.style.height = '79%';
+	body.style.width = '100%';
+	body.style.display = 'flex';
+	
+	banner.style.backgroundColor = '#eeeeee';
+	body.style.backgroundColor = '#aaaaaa';
+	
+	left_column_top.style.height = '50%';
+	left_column_top.style.width = '100%';
+	left_column_top.style.display = 'flex';
+	
+	left_column_bottom.style.height = '49%';
+	left_column_bottom.style.width = '100%';
+	left_column_bottom.style.display = 'flex';
+	
+	left_column_top_left.style.display = 'flex';
+	left_column_top_right.style.display = 'flex';
+	
 	//lets build inside out...start from the bottom of this list and work upwards
 	let radio_1 = document.createElement('input');
+	radio_1.id = channel.id + 'r1';
 	radio_1.type = 'radio';
-	radio_1.name = channel.id + 'r1'; //NEED TO IDENTIFY CHANNEL UP TOP.
+	radio_1.name = channel.id + 'rname'; //NEED TO IDENTIFY CHANNEL UP TOP.
 	radio_1.value = 'Synth';
 	let radio_1_label = document.createElement('label');
-	radio_1_label.for = 'Synth';
+	radio_1_label.for= radio_1.name;
+	radio_1_label.innerHTML = 'Synth';
+	
+	radio_1.style.flex = '1';
+	radio_1.style.margin = 'auto';
+	radio_1_label.style.flex = '2';
+	radio_1_label.style.margin = 'auto';
 	left_column_top_left.appendChild(radio_1);
 	left_column_top_left.appendChild(radio_1_label);
 	
 	let radio_2 = document.createElement('input');
+	radio_2.id = channel.id + 'r2'
 	radio_2.type = 'radio';
-	radio_2.name = channel.id + 'r2'; //NEED TO IDENTIFY CHANNEL UP TOP.
+	radio_2.name = channel.id + 'rname'; //NEED TO IDENTIFY CHANNEL UP TOP.
 	radio_2.value = 'Soundfile';
+	radio_2.checked = true;
 	let radio_2_label = document.createElement('label');
-	radio_2_label.for = 'Soundfile';
+	radio_2_label.for = radio_2.name;
+	radio_2_label.innerHTML = 'Soundfile';
+	
+	radio_2.style.flex = '1';
+	radio_2.style.margin = 'auto';
+	radio_2_label.style.flex = '2';
+	radio_2_label.style.margin = 'auto';
 	left_column_top_right.appendChild(radio_2);
 	left_column_top_right.appendChild(radio_2_label);
 	
+	//NEED LISTENER EVENTS FOR RADIO BUTTONS
+	
+	left_column_top_left.style.flex = '1';
+	left_column_top_right.style.flex = '1';
 	left_column_top.appendChild(left_column_top_left);
 	left_column_top.appendChild(left_column_top_right);
 	
@@ -290,14 +339,83 @@ function createChannel(){
 	volume.max = '100';
 	volume.step = '10';
 	volume.value = '100';
-	volume.name = 'volume';
+	volume.name = channel.id + 'vname';
 	let volume_label = document.createElement('label');
-	volume_label.for = 'volume';
-	left_column_bottom.appendChild(volume);
+	volume_label.for = volume.name;
+	volume_label.innerHTML = 'Volume:'
+	
+	//NEED LISTENER EVENTS FOR VOLUME
+	volume.style.flex = '2';
+	volume.style.margin = 'auto';
+	volume_label.style.flex = '5';
+	volume_label.style.margin = 'auto';
 	left_column_bottom.appendChild(volume_label);
+	left_column_bottom.appendChild(volume);
 	
 	left_column.appendChild(left_column_top);
 	left_column.appendChild(left_column_bottom);
 	
+	let variable_select = document.createElement('select');
+	variable_select.id = channel.id + 's'
+	variable_select.name = channel.id + 'sname';
+	variable_select.margin = 'auto';
+	//need: buildSelectOptions(variable_select, all_synths)
+	buildSelectOptions(variable_select, soundfile);
 	
+	//NEED LISTENER EVENTS FOR SELECT OBJECT
+	
+	right_column.appendChild(variable_select);
+	
+	left_column.style.flex = '3';
+	right_column.style.flex = '1';
+	body.appendChild(left_column);
+	body.appendChild(right_column);
+	
+	let editButton = document.createElement('div');
+	editButton.style.backgroundColor = 'green';
+	//editButton.style.height = '100%';
+	//editButton.style.width = '10%';
+	//editButton.style.display = 'inline-block';
+	editButton.style.flex = '1';
+	editButton.style.border = '1px solid black';
+	editButton.style.borderRadius = '40% 10%';
+	editButton.style.margin = '2px 2px 2px 2px';
+	
+	let minButton = document.createElement('div');
+	minButton.style.backgroundColor = '#7777ff';
+	//minButton.style.height = '100%';
+	//minButton.style.width = '10%';
+	//minButton.style.display = 'inline-block';
+	minButton.style.flex = '1';
+	minButton.style.border = '1px solid black';
+	minButton.style.borderRadius = '10% 40%';
+	minButton.style.margin = '2px 2px 2px 2px';
+	
+	let deleteButton = document.createElement('div');
+	deleteButton.style.backgroundColor = '#ff0000';
+	deleteButton.style.flex = '1';
+	deleteButton.style.border = '1px solid black';
+	deleteButton.style.borderRadius = '10% 40%';
+	deleteButton.style.margin = '2px 2px 2px 2px';
+	
+	
+	let channelName = document.createElement('div');
+	channelName.id = channel.id + 'n'
+	channelName.innerHTML = channel.id + ' (default name)';
+	channelName.style.margin = '5px 5px 5px 5px';
+	channelName.style.flex = '15';
+	
+	banner.appendChild(editButton);
+	banner.appendChild(channelName);
+	banner.appendChild(minButton);
+	banner.appendChild(deleteButton);
+	
+	channel.appendChild(banner);
+	channel.appendChild(body);
+	
+	//might cause issues assigning variables...
+	channel_history.set(channel, {label: channelName.id, volume: volume.value, synth_bool: false, soundfile:variable_select.value, synth: null});
+	console.log(all_channels);
+	console.log(channel_history);
+	document.getElementById("toybox2").appendChild(channel);
 }
