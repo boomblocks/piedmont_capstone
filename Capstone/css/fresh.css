@@ -31,7 +31,7 @@
 }
 #container {
 	margin: auto;
-	border: 5px solid orange;
+	//border: 5px solid orange;
 	width: 75%;
 	display:block;
 }

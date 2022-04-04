@@ -206,8 +206,20 @@ function shuffle_colors(){
 		'E':colors["F"], 'F':colors["G"], 'G':colors["A"]};
 }
 
+function buildSelectOptions(select_object, array){//MAYBE DOESNT WORK
+	//take an array of strings, possibly nulls,
+	//and fill out option values painstakingly.
+	let result = '';
+	for (c in array){
+		if (!(array[c] === null)){
+			result += `<option value="${array[c]}">${array[c]}</option>`;
+		}
+	}
+	select_object.innerHTML = result;
+}
+
 function createChannel(){
-	let channel = document.createElement('div');
+	/*let channel = document.createElement('div');
 	let cs = channel.style;
 	let array_position = NextNull(all_channels);
 	channel.id = "channel"+array_position.toString();
@@ -222,7 +234,6 @@ function createChannel(){
 	cs.display = 'block';
 	cs.float = 'left';
 	document.getElementById("toybox2").appendChild(channel);
-	
 	//make delete button
 	let delete_button = document.createElement('div');
 	delete_button.style.backgroundColor = 'hsl(0, 50%, 50%)';
@@ -231,16 +242,62 @@ function createChannel(){
 	delete_button.id = channel.id + 'd';
 	delete_button.addEventListener('mousedown', function () {document.getElementById("toybox2").removeChild(channel);}, false);
 	channel.appendChild(delete_button);
-	
-	
-	
 	//make volume control
 	//I AM NOT HAPPY WITH CURRENT IMPLEMENTATION
 	channel.innerHTML+=`<div class="left"><span>Volume: </span><input type="range" min="0.0" max="1.0" step="0.01" value="0.5" list="volumes" name="volume"><datalist id="volumes"><option value="0.0" label="Mute"><option value="1.0" label="100%"></datalist></div>`;
-	
 	//make radio buttons
 	let knobs = document.createElement('input');
-	knobs.type = 'radio';
+	knobs.type = 'radio';*/
+	//SO MANY DIVS!
+	
+	let channel = document.createElement('div'); //will have banner and body
+	let banner = document.createElement('div'); // will have edit button, text, minimize, delete
+	let body = document.createElement('div'); //will have left and right columns
+	let left_column = document.createElement('div'); // will have top and bottom divs
+	let right_column = document.createElement('div'); //will have dropdown menu
+	let left_column_top = document.createElement('div'); //will have left/right divs
+	let left_column_bottom = document.createElement('div'); //will have volume bar
+	let left_column_top_left = document.createElement('div'); //will have radio button for synth
+	let left_column_top_right = document.createElement('div'); //will have radio button for soundfile
+	
+	channel.id = '0' //extremely temporary!!
+	//lets build inside out...start from the bottom of this list and work upwards
+	let radio_1 = document.createElement('input');
+	radio_1.type = 'radio';
+	radio_1.name = channel.id + 'r1'; //NEED TO IDENTIFY CHANNEL UP TOP.
+	radio_1.value = 'Synth';
+	let radio_1_label = document.createElement('label');
+	radio_1_label.for = 'Synth';
+	left_column_top_left.appendChild(radio_1);
+	left_column_top_left.appendChild(radio_1_label);
+	
+	let radio_2 = document.createElement('input');
+	radio_2.type = 'radio';
+	radio_2.name = channel.id + 'r2'; //NEED TO IDENTIFY CHANNEL UP TOP.
+	radio_2.value = 'Soundfile';
+	let radio_2_label = document.createElement('label');
+	radio_2_label.for = 'Soundfile';
+	left_column_top_right.appendChild(radio_2);
+	left_column_top_right.appendChild(radio_2_label);
+	
+	left_column_top.appendChild(left_column_top_left);
+	left_column_top.appendChild(left_column_top_right);
+	
+	let volume = document.createElement('input');
+	volume.type = 'range';
+	volume.id = channel.id + 'v';
+	volume.min = '0';
+	volume.max = '100';
+	volume.step = '10';
+	volume.value = '100';
+	volume.name = 'volume';
+	let volume_label = document.createElement('label');
+	volume_label.for = 'volume';
+	left_column_bottom.appendChild(volume);
+	left_column_bottom.appendChild(volume_label);
+	
+	left_column.appendChild(left_column_top);
+	left_column.appendChild(left_column_bottom);
 	
 	
 }
