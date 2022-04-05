@@ -6,6 +6,7 @@
 	height: 400px;
 	resize: height;
 	margin: auto;
+	background-color: #ffffff;
 }
 
 #toybox2 {
@@ -17,6 +18,7 @@
 	resize: height;
 	margin: 0 0 0 0;
 	display: inline-block;
+	background-color: #ffffff;
 }
 
 #toybox3 {
@@ -28,6 +30,7 @@
 	resize: height;
 	margin: 0 0 0 0;
 	display: inline-block;
+	background-color: #ffffff;
 }
 #container {
 	margin: auto;

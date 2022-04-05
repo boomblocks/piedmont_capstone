@@ -219,37 +219,7 @@ function buildSelectOptions(select_object, array){//MAYBE DOESNT WORK
 }
 
 function createChannel(){
-	/*let channel = document.createElement('div');
-	let cs = channel.style;
-	let array_position = NextNull(all_channels);
-	channel.id = "channel"+array_position.toString();
-	all_channels[array_position] = channel;
-	//channel_history.set(channel, {name; volume; synth_bool; soundfile; synth});
-	//button.style = `background-color:${color}; height: 125px; width:125px; border:1px solid black`;
-	cs.border= '1px solid black';
-	cs.backgroundColor = '#eeeeee';
-	cs.height = '120px';
-	cs.width = '100%';
-	cs.margin = '0 0 0 0';
-	cs.display = 'block';
-	cs.float = 'left';
-	document.getElementById("toybox2").appendChild(channel);
-	//make delete button
-	let delete_button = document.createElement('div');
-	delete_button.style.backgroundColor = 'hsl(0, 50%, 50%)';
-	delete_button.style.height = '12px';
-	delete_button.style.width = '12px';
-	delete_button.id = channel.id + 'd';
-	delete_button.addEventListener('mousedown', function () {document.getElementById("toybox2").removeChild(channel);}, false);
-	channel.appendChild(delete_button);
-	//make volume control
-	//I AM NOT HAPPY WITH CURRENT IMPLEMENTATION
-	channel.innerHTML+=`<div class="left"><span>Volume: </span><input type="range" min="0.0" max="1.0" step="0.01" value="0.5" list="volumes" name="volume"><datalist id="volumes"><option value="0.0" label="Mute"><option value="1.0" label="100%"></datalist></div>`;
-	//make radio buttons
-	let knobs = document.createElement('input');
-	knobs.type = 'radio';*/
 	//SO MANY DIVS!
-	
 	let channel = document.createElement('div'); //will have banner and body
 	let banner = document.createElement('div'); // will have edit button, text, minimize, delete
 	let body = document.createElement('div'); //will have left and right columns
@@ -277,8 +247,8 @@ function createChannel(){
 	body.style.width = '100%';
 	body.style.display = 'flex';
 	
-	banner.style.backgroundColor = '#eeeeee';
-	body.style.backgroundColor = '#aaaaaa';
+	banner.style.backgroundColor = '#cccccc';
+	body.style.backgroundColor = '#999999';
 	
 	left_column_top.style.height = '50%';
 	left_column_top.style.width = '100%';
@@ -418,4 +388,50 @@ function createChannel(){
 	console.log(all_channels);
 	console.log(channel_history);
 	document.getElementById("toybox2").appendChild(channel);
+}
+
+function createSynth (){
+	let synth = document.createElement('div');
+	let banner = document.createElement('div');
+	let body = document.createElement('div');
+	let left_column = document.createElement('div');
+	let right_column = document.createElement('div');
+	let left_column_top = document.createElement('div');
+	let left_column_top_left = document.createElement('div');
+	let left_column_top_right = document.createElement('div');
+	let left_column_bottom_left = document.createElement('div');
+	let left_column_bottom_right = document.createElement('div');
+	let right_column_top = document.createElement('div');
+	let right_column_top_left = document.createElement('div');
+	let right_column_top_right = document.createElement('div');
+	let right_column_bottom_left = document.createElement('div');
+	let right_column_bottom_right = document.createElement('div');
+	
+	//BUILDING BANNER FIRST
+	let editButton = document.createElement('div');
+	editButton.style.backgroundColor = 'green';
+	editButton.style.flex = '1';
+	editButton.style.border = '1px solid black';
+	editButton.style.borderRadius = '40% 10%';
+	editButton.style.margin = '2px 2px 2px 2px';
+	
+	let minButton = document.createElement('div');
+	minButton.style.backgroundColor = '#7777ff';
+	minButton.style.flex = '1';
+	minButton.style.border = '1px solid black';
+	minButton.style.borderRadius = '10% 40%';
+	minButton.style.margin = '2px 2px 2px 2px';
+	
+	let deleteButton = document.createElement('div');
+	deleteButton.style.backgroundColor = '#ff0000';
+	deleteButton.style.flex = '1';
+	deleteButton.style.border = '1px solid black';
+	deleteButton.style.borderRadius = '10% 40%';
+	deleteButton.style.margin = '2px 2px 2px 2px';
+	
+	let synthName = document.createElement('div');
+	synthName.id = synth.id + 'n'
+	synthName.innerHTML = synth.id + ' (default name)';
+	synthName.style.margin = '5px 5px 5px 5px';
+	synthName.style.flex = '15';
 }
