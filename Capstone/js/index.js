@@ -331,7 +331,6 @@ function createChannel(){
 	variable_select.id = channel.id + 's'
 	variable_select.name = channel.id + 'sname';
 	variable_select.margin = 'auto';
-	//need: buildSelectOptions(variable_select, all_synths)
 	buildSelectOptions(variable_select, soundfile);
 	
 	//NEED LISTENER EVENTS FOR SELECT OBJECT
@@ -496,7 +495,7 @@ function createSynth (){
 	right_column_bottom_right_right.style.flex = '1';
 	
 	//troubleshooting borders...
-	
+	/*
 	left_column.style.border = '1px solid black';
 	left_column_top.style.border = '1px solid black';
 	left_column_top_left.style.border = '1px solid black';
@@ -520,7 +519,7 @@ function createSynth (){
 	right_column_bottom_left_right.style.border = '1px solid black';
 	right_column_bottom_right.style.border = '1px solid black';
 	right_column_bottom_right_left.style.border = '1px solid black';
-	right_column_bottom_right_right.style.border = '1px solid black';
+	right_column_bottom_right_right.style.border = '1px solid black';*/
 		
 	
 	//BUILDING BANNER ELEMENTS
@@ -556,13 +555,48 @@ function createSynth (){
 	banner.appendChild(minButton);
 	banner.appendChild(deleteButton);
 	
+	//BUILDING LEFT COLUMN ELEMENTS
+	
+	let freq_select = document.createElement('select');
+	freq_select.id = synth.id + 's'
+	freq_select.name = synth.id + 'select';
+	freq_select.margin = 'auto';
+	buildSelectOptions(freq_select, ['A','B','C']);
+	
+	let freq_label = document.createElement('label');
+	freq_label.for = freq_select.name;
+	freq_label.innerHTML = 'Frequency:'
+	freq_label.style.margin = 'auto';
+	
+	left_column_top_left.appendChild(freq_label);
+	left_column_top_right.appendChild(freq_select);
+	
+	let volume = document.createElement('input');
+	volume.type = 'range';
+	volume.id = synth.id + 'v';
+	volume.min = '0';
+	volume.max = '100';
+	volume.step = '10';
+	volume.value = '100';
+	volume.name = synth.id + 'vname';
+	volume.style.margin = 'auto';
+	
+	let volume_label = document.createElement('label');
+	volume_label.for = volume.name;
+	volume_label.innerHTML = 'Volume:'
+	volume_label.style.margin = 'auto';
+	
+	left_column_bottom_left.appendChild(volume_label);
+	left_column_bottom_right.appendChild(volume);
+	
 	//BUILDING RIGHT COLUMN ELEMENTS
 	//SINE
 	let sine_radio = document.createElement('input');
 	sine_radio.id = synth.id + 'sir';
 	sine_radio.type = 'radio';
-	sine_radio.name = sine_radio.id + 'name';
+	sine_radio.name = synth.id + 'radio';
 	sine_radio.value = 'sine';
+	sine_radio.checked = true;
 	sine_radio.style.margin = 'auto';
 	
 	right_column_top_left_left.appendChild(sine_radio);
@@ -578,7 +612,7 @@ function createSynth (){
 	let square_radio = document.createElement('input');
 	square_radio.id = synth.id + 'sqr';
 	square_radio.type = 'radio';
-	square_radio.name = square_radio.id + 'name';
+	square_radio.name = synth.id + 'radio';
 	square_radio.value = 'square';
 	square_radio.style.margin = 'auto';
 	
@@ -595,7 +629,7 @@ function createSynth (){
 	let saw_radio = document.createElement('input');
 	saw_radio.id = synth.id + 'sar';
 	saw_radio.type = 'radio';
-	saw_radio.name = saw_radio.id + 'name';
+	saw_radio.name = synth.id + 'radio';
 	saw_radio.value = 'saw';
 	saw_radio.style.margin = 'auto';
 	
@@ -603,7 +637,7 @@ function createSynth (){
 	
 	let saw_label = document.createElement('label');
 	saw_label.for = saw_radio.name;
-	saw_label.innerHTML = 'sine';
+	saw_label.innerHTML = 'saw';
 	saw_label.style.margin = 'auto';
 	
 	right_column_bottom_left_right.appendChild(saw_label);
@@ -612,7 +646,7 @@ function createSynth (){
 	let tri_radio = document.createElement('input');
 	tri_radio.id = synth.id + 'trr';
 	tri_radio.type = 'radio';
-	tri_radio.name = tri_radio.id + 'name';
+	tri_radio.name = synth.id + 'radio';
 	tri_radio.value = 'triangle';
 	tri_radio.style.margin = 'auto';
 	
@@ -624,14 +658,6 @@ function createSynth (){
 	tri_label.style.margin = 'auto';
 	
 	right_column_bottom_right_right.appendChild(tri_label);
-	/*
-	let sine_label = document.createElement('label');
-	radio_1_label.for= radio_1.name;
-	radio_1_label.innerHTML = 'Synth';
-	
-	radio_1_label.style.flex = '2';
-	radio_1_label.style.margin = 'auto';
-	left_column_top_left.appendChild(radio_1_label);*/
 	
 	//ACTUAL CONSTRUCTION
 	left_column_bottom.appendChild(left_column_bottom_left);
