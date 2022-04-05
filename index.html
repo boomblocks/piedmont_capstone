@@ -25,6 +25,17 @@
 			<div id="toybox3">
 			</div>
 		</div>
+		<div id="troubleshoot"></div>
+		<script>
+			document.getElementById('troubleshoot').style.height = '50px';
+			document.getElementById('troubleshoot').style.width = '50px';
+			//document.getElementById('troubleshoot').style.display = 'none';
+			document.getElementById('troubleshoot').style.backgroundColor = 'blue';
+			document.getElementById('troubleshoot').style.border = '4px solid green';
+			document.getElementById('troubleshoot').addEventListener("touchstart",function(){console.log('touchstart')},false);
+			document.getElementById('troubleshoot').addEventListener("touchend",function(){Play('test')},false);
+			document.getElementById('troubleshoot').addEventListener("mousedown",function(){console.log('mousedown')},false);
+		</script>
 		<script>
 			//TEMPORARY!!
 			for (let i=0;i!=6;i++){Test();}
@@ -52,6 +63,10 @@
 				}
 			}
 			function Play(button){
+				if (button == 'test'){
+					let sound = new Audio(soundfile[increment]);
+					sound.play();
+					return}
 				if (!(button_history.get(button)['quiet_bool'])){
 					let sound = new Audio(soundfile[increment]);
 					sound.play();
