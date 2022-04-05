@@ -17,20 +17,18 @@
 			<button id='play' onclick="Play();">Play Sound</button>
 			<p id= >header</p>
 		</div>
-		<div id="BigPapa">
-			<div id="toybox1">
-			</div>
-			<div id="container">
-				<div id="toybox2">
-				</div>
-				<div id="toybox3">
-				</div>
-			</div>
+		<div id="toybox1">
 		</div>
-		<div id="LilPapa" style="display: none;">
-			<p>Really, that works??</p>
+		<div id="container">
+			<div id="toybox2">
+			</div>
+			<div id="toybox3">
+			</div>
 		</div>
 		<script>
+			//TEMPORARY!!
+			Test();
+		
 			function lava(){
 				if (!(TestClicked)){
 					TestClicked = true;
@@ -62,8 +60,8 @@
 						increment = 0;
 					}
 				}
-				document.getElementById('BigPapa').style.display = 'none';
-				document.getElementById('LilPapa').style.display = '';
+				//document.getElementById('BigPapa').style.display = 'none';
+				//document.getElementById('LilPapa').style.display = '';
 			}
 		</script>
 	</body>

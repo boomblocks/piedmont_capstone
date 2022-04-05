@@ -34,6 +34,7 @@ var	soundfile = ["./audio/Ahh!_1.wav",
 function Test(){
 	createButton();
 	createChannel();
+	createSynth();
 	shuffle_colors();
 	
 }
@@ -233,11 +234,12 @@ function createChannel(){
 	//first, handle channel object stuff
 	channel.style.height = '30%';
 	channel.style.width = '100%';
-	channel.style.overflow = 'hidden';
+	//channel.style.overflow = 'hidden';
 	let array_position = NextNull(all_channels);
 	channel.id = 'channel'+array_position.toString();
 	all_channels[array_position] = channel;
 	
+	//MAJOR STRUCTURAL INFORMATION
 	banner.style.height = '20%';
 	banner.style.width = '100%';
 	banner.style.display = 'flex';
@@ -385,29 +387,143 @@ function createChannel(){
 	
 	//might cause issues assigning variables...
 	channel_history.set(channel, {label: channelName.id, volume: volume.value, synth_bool: false, soundfile:variable_select.value, synth: null});
-	console.log(all_channels);
-	console.log(channel_history);
 	document.getElementById("toybox2").appendChild(channel);
 }
 
 function createSynth (){
+	//lol yeah I am showing I don't understand CSS
+	//MAIN DIVS
 	let synth = document.createElement('div');
 	let banner = document.createElement('div');
 	let body = document.createElement('div');
+	
+	//LEFT COLUMN
 	let left_column = document.createElement('div');
-	let right_column = document.createElement('div');
 	let left_column_top = document.createElement('div');
 	let left_column_top_left = document.createElement('div');
 	let left_column_top_right = document.createElement('div');
+	let left_column_bottom = document.createElement('div');
 	let left_column_bottom_left = document.createElement('div');
 	let left_column_bottom_right = document.createElement('div');
+	
+	//RIGHT COLUMN
+	let right_column = document.createElement('div');
 	let right_column_top = document.createElement('div');
 	let right_column_top_left = document.createElement('div');
+	let right_column_top_left_left = document.createElement('div');
+	let right_column_top_left_right = document.createElement('div');
 	let right_column_top_right = document.createElement('div');
+	let right_column_top_right_left = document.createElement('div');
+	let right_column_top_right_right = document.createElement('div');
+	let right_column_bottom = document.createElement('div');
 	let right_column_bottom_left = document.createElement('div');
+	let right_column_bottom_left_left = document.createElement('div');
+	let right_column_bottom_left_right = document.createElement('div');
 	let right_column_bottom_right = document.createElement('div');
+	let right_column_bottom_right_left = document.createElement('div');
+	let right_column_bottom_right_right = document.createElement('div');
 	
-	//BUILDING BANNER FIRST
+	//MAJOR STRUCTURAL INFORMATION
+	synth.style.height = '30%';
+	synth.style.width = '100%';
+	let array_position = NextNull(all_synths);
+	synth.id = 'synth'+array_position.toString();
+	all_synths[array_position] = synth;
+	
+	banner.style.height = '20%';
+	banner.style.width = '100%';
+	banner.style.display = 'flex';
+	
+	body.style.height = '79%';
+	body.style.width = '100%';
+	body.style.display = 'flex';
+	
+	banner.style.backgroundColor = '#cccccc';
+	body.style.backgroundColor = '#999999';
+	
+	//LEFT COLUMN STRUCTURAL INFORMATION
+	left_column.style.height = '100%';
+	left_column.style.flex = '1';
+	
+	left_column_top.style.height = '50%';
+	left_column_top.style.width = '100%';
+	left_column_top.style.display = 'flex';
+	
+	left_column_top_left.style.flex = '1';
+	left_column_top_right.style.flex = '1';
+	
+	left_column_bottom.style.height = '49%';
+	left_column_bottom.style.width = '100%';
+	left_column_bottom.style.display = 'flex';
+	
+	left_column_bottom_left.style.flex = '1';
+	left_column_bottom_right.style.flex = '1';
+	
+	//RIGHT COLUMN STRUCTURAL INFORMATION
+	right_column.style.height = '100%';
+	right_column.style.flex = '1';
+	
+	right_column_top.style.height = '50%';
+	right_column_top.style.width = '100%';
+	right_column_top.style.display = 'flex';
+	
+	right_column_top_left.style.display = 'flex';
+	right_column_top_left.style.flex = '1';
+	
+	right_column_top_left_left.style.flex = '1';
+	right_column_top_left_right.style.flex = '1';
+	
+	right_column_top_right.style.display = 'flex';
+	right_column_top_right.style.flex = '1';
+	
+	right_column_top_right_left.style.flex = '1';
+	right_column_top_right_right.style.flex = '1';
+	
+	right_column_bottom.style.height = '50%';
+	right_column_bottom.style.width = '100%';
+	right_column_bottom.style.display = 'flex';
+	
+	right_column_bottom_left.style.display = 'flex';
+	right_column_bottom_left.style.flex = '1';
+	
+	right_column_bottom_left_left.style.flex = '1';
+	right_column_bottom_left_right.style.flex = '1';
+	
+	right_column_bottom_right.style.display = 'flex';
+	right_column_bottom_right.style.flex = '1';
+	
+	right_column_bottom_right_left.style.flex = '1';
+	right_column_bottom_right_right.style.flex = '1';
+	
+	//troubleshooting borders...
+	
+	left_column.style.border = '1px solid black';
+	left_column_top.style.border = '1px solid black';
+	left_column_top_left.style.border = '1px solid black';
+	left_column_top_right.style.border = '1px solid black';
+	left_column_bottom.style.border = '1px solid black';
+	left_column_bottom_left.style.border = '1px solid black';
+	left_column_bottom_right.style.border = '1px solid black';
+	
+	//RIGHT COLUMN
+	right_column.style.border = '1px solid black';
+	right_column_top.style.border = '1px solid black';
+	right_column_top_left.style.border = '1px solid black';
+	right_column_top_left_left.style.border = '1px solid black';
+	right_column_top_left_right.style.border = '1px solid black';
+	right_column_top_right.style.border = '1px solid black';
+	right_column_top_right_left.style.border = '1px solid black';
+	right_column_top_right_right.style.border = '1px solid black';
+	right_column_bottom.style.border = '1px solid black';
+	right_column_bottom_left.style.border = '1px solid black';
+	right_column_bottom_left_left.style.border = '1px solid black';
+	right_column_bottom_left_right.style.border = '1px solid black';
+	right_column_bottom_right.style.border = '1px solid black';
+	right_column_bottom_right_left.style.border = '1px solid black';
+	right_column_bottom_right_right.style.border = '1px solid black';
+		
+	
+	//BUILDING BANNER ELEMENTS
 	let editButton = document.createElement('div');
 	editButton.style.backgroundColor = 'green';
 	editButton.style.flex = '1';
@@ -434,4 +550,122 @@ function createSynth (){
 	synthName.innerHTML = synth.id + ' (default name)';
 	synthName.style.margin = '5px 5px 5px 5px';
 	synthName.style.flex = '15';
+	
+	banner.appendChild(editButton);
+	banner.appendChild(synthName);
+	banner.appendChild(minButton);
+	banner.appendChild(deleteButton);
+	
+	//BUILDING RIGHT COLUMN ELEMENTS
+	//SINE
+	let sine_radio = document.createElement('input');
+	sine_radio.id = synth.id + 'sir';
+	sine_radio.type = 'radio';
+	sine_radio.name = sine_radio.id + 'name';
+	sine_radio.value = 'sine';
+	sine_radio.style.margin = 'auto';
+	
+	right_column_top_left_left.appendChild(sine_radio);
+	
+	let sine_label = document.createElement('label');
+	sine_label.for = sine_radio.name;
+	sine_label.innerHTML = 'sine';
+	sine_label.style.margin = 'auto';
+	
+	right_column_top_left_right.appendChild(sine_label);
+	
+	//SQUARE
+	let square_radio = document.createElement('input');
+	square_radio.id = synth.id + 'sqr';
+	square_radio.type = 'radio';
+	square_radio.name = square_radio.id + 'name';
+	square_radio.value = 'square';
+	square_radio.style.margin = 'auto';
+	
+	right_column_top_right_left.appendChild(square_radio);
+	
+	let square_label = document.createElement('label');
+	square_label.for = square_radio.name;
+	square_label.innerHTML = 'square';
+	square_label.style.margin = 'auto';
+	
+	right_column_top_right_right.appendChild(square_label);
+	
+	//SAW
+	let saw_radio = document.createElement('input');
+	saw_radio.id = synth.id + 'sar';
+	saw_radio.type = 'radio';
+	saw_radio.name = saw_radio.id + 'name';
+	saw_radio.value = 'saw';
+	saw_radio.style.margin = 'auto';
+	
+	right_column_bottom_left_left.appendChild(saw_radio);
+	
+	let saw_label = document.createElement('label');
+	saw_label.for = saw_radio.name;
+	saw_label.innerHTML = 'sine';
+	saw_label.style.margin = 'auto';
+	
+	right_column_bottom_left_right.appendChild(saw_label);
+	
+	//TRIANGLE
+	let tri_radio = document.createElement('input');
+	tri_radio.id = synth.id + 'trr';
+	tri_radio.type = 'radio';
+	tri_radio.name = tri_radio.id + 'name';
+	tri_radio.value = 'triangle';
+	tri_radio.style.margin = 'auto';
+	
+	right_column_bottom_right_left.appendChild(tri_radio);
+	
+	let tri_label = document.createElement('label');
+	tri_label.for = tri_radio.name;
+	tri_label.innerHTML = 'triangle';
+	tri_label.style.margin = 'auto';
+	
+	right_column_bottom_right_right.appendChild(tri_label);
+	/*
+	let sine_label = document.createElement('label');
+	radio_1_label.for= radio_1.name;
+	radio_1_label.innerHTML = 'Synth';
+	
+	radio_1_label.style.flex = '2';
+	radio_1_label.style.margin = 'auto';
+	left_column_top_left.appendChild(radio_1_label);*/
+	
+	//ACTUAL CONSTRUCTION
+	left_column_bottom.appendChild(left_column_bottom_left);
+	left_column_bottom.appendChild(left_column_bottom_right);
+	
+	left_column_top.appendChild(left_column_top_left);
+	left_column_top.appendChild(left_column_top_right);
+	
+	left_column.appendChild(left_column_top);
+	left_column.appendChild(left_column_bottom);
+	
+	right_column_bottom_left.appendChild(right_column_bottom_left_left);
+	right_column_bottom_left.appendChild(right_column_bottom_left_right);
+	right_column_bottom_right.appendChild(right_column_bottom_right_left);
+	right_column_bottom_right.appendChild(right_column_bottom_right_right);
+	right_column_bottom.appendChild(right_column_bottom_left);
+	right_column_bottom.appendChild(right_column_bottom_right);
+	
+	right_column_top_left.appendChild(right_column_top_left_left);
+	right_column_top_left.appendChild(right_column_top_left_right);
+	right_column_top_right.appendChild(right_column_top_right_left);
+	right_column_top_right.appendChild(right_column_top_right_right);
+	right_column_top.appendChild(right_column_top_left);
+	right_column_top.appendChild(right_column_top_right);
+	
+	right_column.appendChild(right_column_top);
+	right_column.appendChild(right_column_bottom);
+	
+	body.appendChild(left_column);
+	body.appendChild(right_column);
+	
+	synth.appendChild(banner);
+	synth.appendChild(body);
+	
+	//HANDLE SYNTH HISTORY HERE
+	document.getElementById('toybox3').appendChild(synth);
 }
