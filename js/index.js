@@ -118,11 +118,12 @@ function createButton(){
 	let deleteButton = document.createElement('div');
 	deleteButton.style.backgroundColor = '#ff0000';
 	deleteButton.style.border = '1px solid black';
-	deleteButton.style.borderRadius = '10% 40%';
+	deleteButton.style.borderRadius = '100% 100%';
 	deleteButton.style.heigth = '100%';
 	//deleteButton.style.width = '10%';
 	deleteButton.style.flex = '2';
 	//deleteButton.style.margin = 'auto';
+	deleteButton.addEventListener('mousedown', function(){console.log(`delete ${button.id}`)},false);
 	
 	let ugly_invisible_cardboard_1 = document.createElement('div');
 	ugly_invisible_cardboard_1.style.flex = '15';
@@ -166,7 +167,6 @@ function createButton(){
 	//channel_select.addEventListener("change", function() {console.log('channel_changed!');
 	//	button_history.set(button, {color:color_select.value, channel: button_history.get(button)['channel'], quiet_bool:true});}, false);
 	buildSelectOptions(channel_select, all_channels);
-	console.log(channel_select);
 	bottom_right.appendChild(channel_select);
 	
 	let channel_label = document.createElement('label');
@@ -180,9 +180,10 @@ function createButton(){
 	exit.style.backgroundColor = 'hsl(127, 70%, 50%)';
 	exit.style.flex = '12';
 	exit.style.border = '1px solid black';
-	exit.style.borderRadius = '10%';
+	exit.style.borderRadius = '25% 25%';
 	exit.style.height = '90%';
 	exit.style.margin = 'auto';
+	exit.addEventListener('mousedown', function(){editMenu(button,false)},false);
 	
 	let ugly_invisible_cardboard_3 = document.createElement('div');
 	ugly_invisible_cardboard_3.style.flex = '9';
@@ -191,13 +192,6 @@ function createButton(){
 	ugly_invisible_cardboard_4.style.flex = '9';
 	foot.appendChild(exit);
 	foot.appendChild(ugly_invisible_cardboard_4);
-	
-	
-	
-	
-	
-	
-	
 	
 	//ACTUAL CONSTRUCTION
 	top.appendChild(top_left);
@@ -236,7 +230,7 @@ function createButton(){
 	edit_button.style.borderRadius = '40% 10%';
 	edit_button.style.display = '';
 	edit_button.style.margin = '5px 5px 5px 5px';
-	edit_button.addEventListener('mousedown', function () {editMenu(button)}, false);
+	edit_button.addEventListener('mousedown', function () {editMenu(button,true)}, false);
 	
 	button.appendChild(edit_button);
 	
@@ -250,11 +244,16 @@ function deleteThis(id, button){
 	button_history.delete(button);
 }
 
-function editMenu(button){
+function editMenu(button, bool){
 	//make quiet, hide edit_button, reveal edit menu
-	console.log('show edit menu');
-	document.getElementById(button.id+'e').style.display = 'none';
-	document.getElementById(button.id+'cloak').style.display = 'inline-block';
+	//MAKE QUIET
+	if (bool){
+		document.getElementById(button.id+'e').style.display = 'none';
+		document.getElementById(button.id+'cloak').style.display = 'inline-block';
+	} else {
+		document.getElementById(button.id+'e').style.display = '';
+		document.getElementById(button.id+'cloak').style.display = 'none';
+	}
 }
 
 function editMenu_VER_0(button){
