@@ -61,24 +61,186 @@ function createButton(){
 	bs.height = '120px';
 	bs.width = '120px';
 	bs.border = 'solid black 1px';
+	bs.borderRadius = '10%';
 	bs.display = 'inline-block';
 	bs.margin = '5px 5px 5px 5px';
+	bs.overflow = 'hidden';
 	bs.float = 'left';
 	//button.addEventListener('mousedown', function () {deleteThis(button.id, button)}, false);
 	button.addEventListener("touchstart", function () {Play(button)}, false);
 	button.addEventListener('mousedown', function () {Play(button)}, false);
-	document.getElementById("toybox1").appendChild(button);
+	
+	//BUILDING EDIT MENU
+	//MAIN DIVS
+	let head = document.createElement('div');//holds delete button
+	let body = document.createElement('div');//holds top and bottom
+	let foot = document.createElement('div');//holds exit button
+	let invisibility_cloak = document.createElement('div');
+	invisibility_cloak.id = button.id+'cloak';
+	
+	//structure divs
+	let top = document.createElement('div'); //holds color select
+	let top_left = document.createElement('div');
+	let top_right = document.createElement('div');
+	
+	let bottom = document.createElement('div'); //holds channel select
+	let bottom_left = document.createElement('div');
+	let bottom_right = document.createElement('div');
+	
+	//STYLE INFO
+	invisibility_cloak.style.height = '95%';
+	invisibility_cloak.style.width = '100%';
+	head.style.height = '15%';
+	head.style.width = '100%';
+	body.style.height = '69%';
+	body.style.width = '100%';
+	foot.style.height = '15%';
+	foot.style.width = '100%';
+	
+	invisibility_cloak.style.display = 'none';
+	head.style.display = 'flex';
+	foot.style.display = 'flex';
+	
+	top.style.display = 'flex';
+	top.style.height = '50%';
+	top.style.width = '100%';
+	bottom.style.display = 'flex';
+	bottom.style.height = '49%';
+	bottom.style.width = '100%';
+	
+	top_left.style.flex = '1';
+	top_right.style.flex = '1';
+	bottom_left.style.flex = '1';
+	bottom_right.style.flex = '1';
+	
+	//ELEMENTS
+	//DELETE BUTTON
+	let deleteButton = document.createElement('div');
+	deleteButton.style.backgroundColor = '#ff0000';
+	deleteButton.style.border = '1px solid black';
+	deleteButton.style.borderRadius = '10% 40%';
+	deleteButton.style.heigth = '100%';
+	//deleteButton.style.width = '10%';
+	deleteButton.style.flex = '2';
+	//deleteButton.style.margin = 'auto';
+	
+	let ugly_invisible_cardboard_1 = document.createElement('div');
+	ugly_invisible_cardboard_1.style.flex = '15';
+	head.appendChild(ugly_invisible_cardboard_1);
+	let ugly_invisible_cardboard_2 = document.createElement('div');
+	ugly_invisible_cardboard_2.style.flex = '1';
+	head.appendChild(deleteButton);
+	head.appendChild(ugly_invisible_cardboard_2);	
+	
+	//COLOR SELECT
+	let color_select = document.createElement('input');
+	color_select.type = "color";
+	
+	let color = button_history.get(button)['color'];
+	
+	//archaic handling of colors... sorry!
+	if (color[0] == 'h'){
+		let some_amount_of_math = RGBtoHex(hslToRGB(stringToHsl(color)));
+		color_select.value = some_amount_of_math;
+	} else if (color[0] == '#'){
+		color_select.value = color;
+	}
+	
+	color_select.style.margin = 'auto';
+	color_select.addEventListener("change", function() {console.log('color_changed!');
+		button_history.set(button, {color:color_select.value, channel: button_history.get(button)['channel'], quiet_bool:true});}, false);
+	top_right.appendChild(color_select);
+	
+	let color_label = document.createElement('label');
+	color_label.for = color_select.name;
+	color_label.innerHTML = 'Color:'
+	color_label.style.margin = 'auto';
+	top_left.appendChild(color_label);
+	
+	//CHANNEL SELECT
+	let channel_select = document.createElement('select');
+	channel_select.id = button.id + "ch";
+	//let channel = button_history.get(button)['channel'];
+	channel_select.value = 'none';
+	channel_select.style.margin = 'auto';
+	//channel_select.addEventListener("change", function() {console.log('channel_changed!');
+	//	button_history.set(button, {color:color_select.value, channel: button_history.get(button)['channel'], quiet_bool:true});}, false);
+	buildSelectOptions(channel_select, all_channels);
+	console.log(channel_select);
+	bottom_right.appendChild(channel_select);
+	
+	let channel_label = document.createElement('label');
+	channel_label.for = channel_select.name;
+	channel_label.innerHTML = 'Channel:'
+	channel_label.style.margin = 'auto';
+	bottom_left.appendChild(channel_label);
+	
+	//EXIT BUTTON
+	let exit = document.createElement('div');
+	exit.style.backgroundColor = 'hsl(127, 70%, 50%)';
+	exit.style.flex = '12';
+	exit.style.border = '1px solid black';
+	exit.style.borderRadius = '10%';
+	exit.style.height = '90%';
+	exit.style.margin = 'auto';
+	
+	let ugly_invisible_cardboard_3 = document.createElement('div');
+	ugly_invisible_cardboard_3.style.flex = '9';
+	foot.appendChild(ugly_invisible_cardboard_3);
+	let ugly_invisible_cardboard_4 = document.createElement('div');
+	ugly_invisible_cardboard_4.style.flex = '9';
+	foot.appendChild(exit);
+	foot.appendChild(ugly_invisible_cardboard_4);
+	
+	
+	
+	
+	
+	
+	
+	
+	//ACTUAL CONSTRUCTION
+	top.appendChild(top_left);
+	top.appendChild(top_right);
+	bottom.appendChild(bottom_left);
+	bottom.appendChild(bottom_right);
+	body.appendChild(top);
+	body.appendChild(bottom);
+	
+	invisibility_cloak.appendChild(head);
+	invisibility_cloak.appendChild(body);
+	invisibility_cloak.appendChild(foot);
+	
+	button.appendChild(invisibility_cloak);
+	
+	//troubleshooting borders...
+	/*
+	head.style.border = '1px solid black';
+	body.style.border = '1px solid black';
+	top.style.border = '1px solid black';
+	top_left.style.border = '1px solid black';
+	top_right.style.border = '1px solid black';
+	bottom.style.border = '1px solid black';
+	bottom_left.style.border = '1px solid black';
+	bottom_right.style.border = '1px solid black';
+	foot.style.border = '1px solid black';
+	invisibility_cloak.style.border = '1px solid black';*/
 	
 	//make edit button
 	let edit_button = document.createElement('div');
 	edit_button.id = button.id + 'e';
-	edit_button.style.backgroundColor = 'hsl(127, 50%, 50%)';
-	edit_button.style.height = '12px';
-	edit_button.style.width = '12px';
-	edit_button.style.float = 'left';
+	edit_button.style.backgroundColor = 'hsl(127, 70%, 50%)';
+	edit_button.style.height = '10%';
+	edit_button.style.width = '10%';
+	edit_button.style.border = '1px solid black';
+	edit_button.style.borderRadius = '40% 10%';
+	edit_button.style.display = '';
+	edit_button.style.margin = '5px 5px 5px 5px';
 	edit_button.addEventListener('mousedown', function () {editMenu(button)}, false);
 	
 	button.appendChild(edit_button);
+	
+	document.getElementById('toybox1').appendChild(button);
 }
 
 function deleteThis(id, button){
@@ -89,6 +251,13 @@ function deleteThis(id, button){
 }
 
 function editMenu(button){
+	//make quiet, hide edit_button, reveal edit menu
+	console.log('show edit menu');
+	document.getElementById(button.id+'e').style.display = 'none';
+	document.getElementById(button.id+'cloak').style.display = 'inline-block';
+}
+
+function editMenu_VER_0(button){
 	//make quiet, remove edit_button
 	button.removeChild(document.getElementById(button.id + 'e'));
 	button.style.backgroundColor = 'grey';
