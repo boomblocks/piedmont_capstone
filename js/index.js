@@ -8,6 +8,7 @@ var button_history = new Map(); // elements are map.get(button) = {color; channe
 var channel_history = new Map(); //elements are map.get(channel)= {label; volume; synth_bool; soundfile(null); synth(null)}
 var synth_history = new Map(); //elements are map.get(synth)= {volume; wave-shape; frequency}
 var increment = 0;
+var hasTouched = false;
 var	soundfile = ["./audio/Ahh!_1.wav",
 		"./audio/Am_Chord_1.wav",
 		"./audio/Bass_1.wav",
@@ -49,6 +50,19 @@ function NextNull(array){
 	return array.length-1;
 };
 
+function divEventBundle(some_element){
+	//This is where I will admit...
+	//I am going to handle touch/mouse event problems
+	//with a bool at the top of the javascript.
+	//IF (!(hasTouched)){ run mousedown event}
+	
+	//this isnt so much a function as it is a clipboard...
+	/*
+	some_element.addEventListener("touchstart", function(){hasTouched=true;console.log('this');}, false);
+	some_element.addEventListener("mousedown", function(){if(!(hasTouched)){console.log('this');}}, false);
+	*/
+};
+
 function createButton(){
 	let button = document.createElement('div');
 	let bs = button.style;
@@ -66,9 +80,10 @@ function createButton(){
 	bs.margin = '5px 5px 5px 5px';
 	bs.overflow = 'hidden';
 	bs.float = 'left';
-	//button.addEventListener('mousedown', function () {deleteThis(button.id, button)}, false);
-	button.addEventListener("touchstart", function () {Play(button)}, false);
-	button.addEventListener('mousedown', function () {Play(button)}, false);
+	button.addEventListener("touchstart", function(){hasTouched=true;console.log(button.id);Play(button);}, false);
+	button.addEventListener("mousedown", function(){if(!(hasTouched)){console.log(button.id);Play(button);}}, false);
+	//button.addEventListener("touchstart", function () {Play(button)}, false);
+	//button.addEventListener('mousedown', function () {Play(button)}, false);
 	
 	//BUILDING EDIT MENU
 	//MAIN DIVS
@@ -123,7 +138,9 @@ function createButton(){
 	//deleteButton.style.width = '10%';
 	deleteButton.style.flex = '2';
 	//deleteButton.style.margin = 'auto';
-	deleteButton.addEventListener('mousedown', function(){console.log(`delete ${button.id}`)},false);
+	deleteButton.addEventListener("touchstart", function(){hasTouched=true;console.log(button.id+'del');}, false);
+	deleteButton.addEventListener("mousedown", function(){if(!(hasTouched)){console.log(button.id+'del');}}, false);
+	//deleteButton.addEventListener('mousedown', function(){console.log(`delete ${button.id}`)},false);
 	
 	let ugly_invisible_cardboard_1 = document.createElement('div');
 	ugly_invisible_cardboard_1.style.flex = '15';
@@ -149,7 +166,8 @@ function createButton(){
 	
 	color_select.style.margin = 'auto';
 	color_select.addEventListener("change", function() {console.log('color_changed!');
-		button_history.set(button, {color:color_select.value, channel: button_history.get(button)['channel'], quiet_bool:true});}, false);
+		button_history.set(button, {color:color_select.value, channel: button_history.get(button)['channel'], quiet_bool:button_history.get(button)['quiet_bool']});
+		button.style.backgroundColor = button_history.get(button)['color'];}, false);
 	top_right.appendChild(color_select);
 	
 	let color_label = document.createElement('label');
@@ -183,7 +201,9 @@ function createButton(){
 	exit.style.borderRadius = '25% 25%';
 	exit.style.height = '90%';
 	exit.style.margin = 'auto';
-	exit.addEventListener('mousedown', function(){editMenu(button,false)},false);
+	exit.addEventListener("touchstart", function(){hasTouched=true;console.log(button.id+'exit');editMenu(button,false);}, false);
+	exit.addEventListener("mousedown", function(){if(!(hasTouched)){console.log(button.id+'exit');editMenu(button,false);}}, false);
+	//exit.addEventListener('mousedown', function(){editMenu(button,false)},false);
 	
 	let ugly_invisible_cardboard_3 = document.createElement('div');
 	ugly_invisible_cardboard_3.style.flex = '9';
@@ -230,7 +250,8 @@ function createButton(){
 	edit_button.style.borderRadius = '40% 10%';
 	edit_button.style.display = '';
 	edit_button.style.margin = '5px 5px 5px 5px';
-	edit_button.addEventListener('mousedown', function () {editMenu(button,true)}, false);
+	edit_button.addEventListener("touchstart", function(){hasTouched=true;console.log(button.id+'edit');editMenu(button,true);}, false);
+	edit_button.addEventListener("mousedown", function(){if(!(hasTouched)){console.log('this'); editMenu(button,true);}}, false);
 	
 	button.appendChild(edit_button);
 	
@@ -248,9 +269,15 @@ function editMenu(button, bool){
 	//make quiet, hide edit_button, reveal edit menu
 	//MAKE QUIET
 	if (bool){
+		button_history.set(button, {color:button_history.get(button)['color'],
+									channel:button_history.get(button)['channel'],
+									quiet_bool:true});
 		document.getElementById(button.id+'e').style.display = 'none';
 		document.getElementById(button.id+'cloak').style.display = 'inline-block';
 	} else {
+		button_history.set(button, {color:button_history.get(button)['color'],
+									channel:button_history.get(button)['channel'],
+									quiet_bool:false});
 		document.getElementById(button.id+'e').style.display = '';
 		document.getElementById(button.id+'cloak').style.display = 'none';
 	}
@@ -288,7 +315,7 @@ function editMenu_VER_0(button){
 	color_select.style.margin = '10px';
 	color_select.style.float = 'centered';
 	color_select.addEventListener("change", function() {
-		button_history.set(button, {color:color_select.value, channel: channel, quiet_bool:true});}, false);
+		button_history.set(button, {color:color_select.value, channel: channel, quiet_bool:button_history.get(button)['quiet_bool']});}, false);
 	button.appendChild(color_select);
 	
 	//make channel select
@@ -388,6 +415,12 @@ function buildSelectOptions(select_object, array){//MAYBE DOESNT WORK
 }
 
 function createChannel(){
+	/*quick note:
+	need to handle channel lists of all current buttons
+	radio buttons will need to update the channel's synth list every time they change
+	*/
+	
+	
 	//SO MANY DIVS!
 	let channel = document.createElement('div'); //will have banner and body
 	let banner = document.createElement('div'); // will have edit button, text, minimize, delete
