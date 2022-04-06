@@ -1271,7 +1271,7 @@ mainGainNode.connect(audioContext.destination);*/
 
 
 function playSynth(synth, button){
-	var audioContext = new (window.AudioContext || window.webkitAudioContext)();
+	var audioContext = new AudioContext();
 	
 	var mainGainNode = audioContext.createGain();
 	mainGainNode.gain.value = synth_history.get(synth)['volume'];
