@@ -1,4 +1,4 @@
-var TestClicked = false;
+var TestClicked = true;
 var interv = null;
 var colors = {'A':(360/7), 'B':(360/7) * 2, 'C':(360/7) * 3, 'D':(360/7) * 4, 'E':(360/7) * 5, 'F':(360/7) * 6, 'G':0};
 var all_buttons = [null];
@@ -128,8 +128,13 @@ function createButton(){
 	bs.margin = '5px 5px 5px 5px';
 	bs.overflow = 'hidden';
 	bs.float = 'left';
-	button.addEventListener("touchstart", function(){hasTouched=true;Play(button);}, false);
-	button.addEventListener("mousedown", function(){if(!(hasTouched)){Play(button);}}, false);
+	button.addEventListener("touchstart", function(){
+		hasTouched=true;
+		Play(button);
+		}, false);
+	button.addEventListener("mousedown", function(){if(!(hasTouched)){
+		Play(button);
+		}}, false);
 	button.addEventListener("touchend", function(){
 		hasTouched=true;
 		console.log('touchend!');
@@ -141,7 +146,7 @@ function createButton(){
 									quiet_bool:button_history.get(button)['quiet_bool'],
 									current_context:null});
 		}
-		}, false);
+	}, false);
 	button.addEventListener("mouseup", function(){if(!(hasTouched)){
 		console.log('mouseup!');
 		if (!(button_history.get(button)['current_context']===null)){
@@ -1104,14 +1109,14 @@ function createSynth (){
 	saw_radio.id = synth.id + 'sar';
 	saw_radio.type = 'radio';
 	saw_radio.name = synth.id + 'radio';
-	saw_radio.value = 'saw';
+	saw_radio.value = 'sawtooth';
 	saw_radio.style.margin = 'auto';
 	
 	right_column_bottom_left_left.appendChild(saw_radio);
 	
 	let saw_label = document.createElement('label');
 	saw_label.for = saw_radio.name;
-	saw_label.innerHTML = 'saw';
+	saw_label.innerHTML = 'sawtooth';
 	saw_label.style.margin = 'auto';
 	
 	right_column_bottom_left_right.appendChild(saw_label);
@@ -1164,7 +1169,7 @@ function createSynth (){
 		}
 	}, false);
 	saw_radio.addEventListener('input', function(){
-		synth_history.set(synth, {volume:synth_history.get(synth)['volume'], wave_shape:'saw', frequency:synth_history.get(synth)['frequency']});
+		synth_history.set(synth, {volume:synth_history.get(synth)['volume'], wave_shape:'sawtooth', frequency:synth_history.get(synth)['frequency']});
 		for (c in all_channels){
 			if (channel_history.get(all_channels[c])['synth_bool']){
 				if (channel_history.get(all_channels[c])['synth'] == synth.id){
@@ -1251,12 +1256,12 @@ button_history.set(button, {color:button_history.get(button)['color'],
 									current_context:null});
 \\\\\
 */
-///*
+/*
 let audioContext = new (window.AudioContext || window.webkitAudioContext)();
 //let oscList = [];
 let mainGainNode = null;
 mainGainNode = audioContext.createGain();
-mainGainNode.connect(audioContext.destination);
+mainGainNode.connect(audioContext.destination);*/
 
 //let keyboard = document.querySelector(".keyboard"); //still useful?
 //let wavePicker = document.querySelector("select[name='waveform']"); //from synth?
@@ -1264,143 +1269,28 @@ mainGainNode.connect(audioContext.destination);
 //let sineTerms = null;
 //let cosineTerms = null;
 
-function playSynth(synthHist, button){
-	console.log(synthHist);
-		
+
+function playSynth(synth, button){
+	var audioContext = new (window.AudioContext || window.webkitAudioContext)();
+	
+	var mainGainNode = audioContext.createGain();
+	mainGainNode.gain.value = synth_history.get(synth)['volume'];
+	mainGainNode.connect(audioContext.destination);
+	
 	let osc = audioContext.createOscillator();
 	osc.connect(mainGainNode);
-
-	//let type = wavePicker.options[wavePicker.selectedIndex].value;
-
-	osc.type = synthHist['wave_shape'];
 	
-	osc.frequency.value = freq_values[synthHist['frequency']];
+	let type = synth_history.get(synth)['wave_shape'];
+	console.log(type === 'sawtooth');
+	osc.type = type;
+	osc.frequency.value = freq_values[synth_history.get(synth)['frequency']];
+	console.log(osc);
+	osc.start();
 
 	button_history.set(button,
 		{color:button_history.get(button)['color'],
 		channel:button_history.get(button)['channel'],
 		quiet_bool:button_history.get(button)['quiet_bool'],
-		current_context: osc});
-
-	mainGainNode.gain.value = synthHist['volume'];
+		current_context: osc});	
 	
-	osc.start();
 }
-
-function setup() {
-	noteFreq = createNoteTable('dont');
-	
-	//volumeControl.addEventListener("change", changeVolume, false);
-	
-	mainGainNode = audioContext.createGain();
-	mainGainNode.connect(audioContext.destination);
-	mainGainNode.gain.value = volumeControl.value;
-	
-	//Create the keys, separate into octave divs
-	/*
-	noteFreq.forEach(function(keys, idx) {
-		let keyList = Object.entries(keys);
-		let octaveElem = document.createElement("div");
-		octaveElem.className = "octave";
-		
-		keyList.forEach(function(key) {
-			if (key[0].length == 1) {
-				octaveElem.appendChild(createKey(key[0], idx, key[1]));
-			}
-		});
-		keyboard.appendChild(octaveElem);
-	});
-	*/
-	
-	//document.querySelector("div[data-note='B'][data-octave='5']").scrollIntoView(false);
-	
-	sineTerms = new Float32Array([0, 0, 1, 0, 1]);
-	cosineTerms = new Float32Array(sineTerms.length);
-
-}
-
-function createKey(note, octave, freq) {//parameters all come from frequency selection in synth
-  let keyElement = document.createElement("div");
-  let labelElement = document.createElement("div");
-
-  keyElement.className = "key";
-  keyElement.dataset["octave"] = octave;
-  keyElement.dataset["note"] = note;
-  keyElement.dataset["frequency"] = freq;
-
-  labelElement.innerHTML = '';//note + "<sub>" + octave + "</sub>"
-  keyElement.appendChild(labelElement);
-  keyElement.id = String(note) + String(octave);//`${note}${octave}`
-  keyElement.addEventListener("mousedown", notePressed, false);
-  keyElement.addEventListener("mouseup", noteReleased, false);
-  keyElement.addEventListener("mouseover", notePressed, false);
-  keyElement.addEventListener("mouseleave", noteReleased, false);
-  keyElement.addEventListener("touchstart", touchOn, false);
-  keyElement.addEventListener("touchend", touchOff, false);
-  let value = 0;
-  keyElement.style["background-color"] = `hsl(${Colors[note]}, 100%, 50%)`;
-  return keyElement;
-}
-
-function playTone(freq) {//worked
-  let osc = audioContext.createOscillator();
-  osc.connect(mainGainNode);
-
-  let type = wavePicker.options[wavePicker.selectedIndex].value;
-
-  if (type == "custom") {
-	osc.setPeriodicWave(customWaveform);
-  } else {
-	osc.type = type;
-  }
-
-  osc.frequency.value = freq;
-  osc.start();
-
-  return osc;
-}
-
-function notePressed(event) {
-  if (event.buttons & 1) {
-	let dataset = event.target.dataset;
-
-	if (!dataset["pressed"]) {
-	  let octave = +dataset["octave"];
-	  oscList[octave][dataset["note"]] = playTone(dataset["frequency"]);
-	  dataset["pressed"] = "yes";
-	}
-  }
-}
-
-function noteReleased(event) {
-  let dataset = event.target.dataset;
-
-  if (dataset && dataset["pressed"]) {
-	let octave = +dataset["octave"];
-	oscList[octave][dataset["note"]].stop();
-	delete oscList[octave][dataset["note"]];
-	delete dataset["pressed"];
-  }
-}
-
-function touchOn(event) {
-	let dataset = event.target.dataset;
-
-	if (!dataset["pressed"]) {
-		let octave = +dataset["octave"];
-		oscList[octave][dataset["note"]] = playTone(dataset["frequency"]);
-		dataset["pressed"] = "yes";
-	}
-}
-
-function touchOff(event){		
-	let dataset = event.target.dataset;
-
-	if (dataset && dataset["pressed"]) {
-		let octave = +dataset["octave"];
-		oscList[octave][dataset["note"]].stop();
-		delete oscList[octave][dataset["note"]];
-		delete dataset["pressed"];
-	}
-}
-//setup();
