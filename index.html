@@ -59,10 +59,13 @@
 						if (channel_history.get(chan)['synth_bool']){
 							console.log('handling a synth...')
 							//update button history for current_context
+							
+							
 						} else {
 							if ((!(channel_history.get(chan)['soundfile']==null))&&(!(channel_history.get(chan)['soundfile']=='null'))){
 								let sound = new Audio(channel_history.get(chan)['soundfile']);
 								sound.play();
+								//modify with volume from channel
 							}
 						}
 					}
