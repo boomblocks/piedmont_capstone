@@ -9,8 +9,7 @@ var channel_history = new Map(); //elements are map.get(channel)= {label; volume
 var synth_history = new Map(); //elements are map.get(synth)= {volume; wave-shape; frequency}
 var increment = 0;
 var hasTouched = false;
-var	soundfile = ["./audio/Ahh!_1.wav",
-		"./audio/Am_Chord_1.wav",
+var	soundfile = ["./audio/Am_Chord_1.wav",
 		"./audio/Bass_1.wav",
 		"./audio/C_Chord_1.wav",
 		"./audio/Chinese.wav",
@@ -26,7 +25,8 @@ var	soundfile = ["./audio/Ahh!_1.wav",
 		"./audio/Kick_1.wav",
 		"./audio/Punch_1.wav",
 		"./audio/Snare_1.wav",
-		"./audio/Thawck_1.wav"];
+		"./audio/Thawck_1.wav",
+		"./audio/Ahh!_1.wav"];
 //let sound = new Audio("soundfile.wav");
 //sound.play();
 
@@ -138,8 +138,8 @@ function createButton(){
 	//deleteButton.style.width = '10%';
 	deleteButton.style.flex = '2';
 	//deleteButton.style.margin = 'auto';
-	deleteButton.addEventListener("touchstart", function(){hasTouched=true;console.log(button.id+'del');}, false);
-	deleteButton.addEventListener("mousedown", function(){if(!(hasTouched)){console.log(button.id+'del');}}, false);
+	deleteButton.addEventListener("touchstart", function(){hasTouched=true;console.log(button.id+'del');deleteThis(button);}, false);
+	deleteButton.addEventListener("mousedown", function(){if(!(hasTouched)){console.log(button.id+'del');deleteThis(button);}}, false);
 	//deleteButton.addEventListener('mousedown', function(){console.log(`delete ${button.id}`)},false);
 	
 	let ugly_invisible_cardboard_1 = document.createElement('div');
@@ -254,15 +254,40 @@ function createButton(){
 	edit_button.addEventListener("mousedown", function(){if(!(hasTouched)){console.log('this'); editMenu(button,true);}}, false);
 	
 	button.appendChild(edit_button);
+	button_history.set(button, {color:`hsl(${colors['A']}, 100%, 50%)`, channel: channel_select.value, quiet_bool: false});
 	
 	document.getElementById('toybox1').appendChild(button);
 }
 
-function deleteThis(id, button){
-	var item = document.getElementById(id);
-	item.parentNode.removeChild(item);
-	all_buttons[all_buttons.indexOf(button)] = null;
-	button_history.delete(button);
+function deleteThis(thing){
+	let is_button = button_history.delete(thing);
+	let is_channel = channel_history.delete(thing);
+	let is_synth = synth_history.delete(thing);
+	if (is_button){
+		all_buttons[all_buttons.indexOf(thing)] = null;
+	} else if (is_channel){
+		let handler = all_channels[all_channels.indexOf(thing)];
+		all_channels[all_channels.indexOf(thing)] = null;
+		//UPDATE CHANNEL OPTIONS FOR ALL BUTTONS
+		//error handle here
+		for (c in all_buttons){
+			if (!(all_buttons[c] === null)){
+				buildSelectOptions(document.getElementById(all_buttons[c].id+'ch'), all_channels);
+				if (handler = button_history.get(all_buttons[c])['channel']){
+					console.log('your channel is dead bro');
+					button_history.set(all_buttons[c], {color:button_history.get(all_buttons[c])['color'],
+									channel:document.getElementById(all_buttons[c].id+'ch').value,
+									quiet_bool:button_history.get(all_buttons[c])});
+					//selected channel needs to reflect truth...
+				}
+			}
+		}
+	} else if (is_synth){
+		all_synths[all_synths.indexOf(thing)] = null;
+		//UPDATE SYNTH OPTIONS FOR ALL CHANNELS
+		//error handle here
+	}
+	thing.parentNode.removeChild(thing);
 }
 
 function editMenu(button, bool){
@@ -416,8 +441,15 @@ function buildSelectOptions(select_object, array){//MAYBE DOESNT WORK
 
 function createChannel(){
 	/*quick note:
-	need to handle channel lists of all current buttons
-	radio buttons will need to update the channel's synth list every time they change
+	need to handle channel lists of all current buttons at the end of this function
+	
+	the following elements still need listener events...
+	rename - structural issues
+	minimize - structural issues
+	delete
+	radio buttons
+	volume
+	variable_select
 	*/
 	
 	
@@ -562,6 +594,16 @@ function createChannel(){
 	minButton.style.border = '1px solid black';
 	minButton.style.borderRadius = '10% 40%';
 	minButton.style.margin = '2px 2px 2px 2px';
+	minButton.addEventListener("touchstart", function(){hasTouched=true;;minimize(channel);}, false);
+	minButton.addEventListener("mousedown", function(){if(!(hasTouched)){minimize(channel);}}, false);
+	//creating invis
+	let invisibility_cloak = document.createElement('div');
+	invisibility_cloak.style.display = '';
+	invisibility_cloak.id = channel.id+'i';
+	invisibility_cloak.style.height = '100%';
+	invisibility_cloak.style.width = '100%';
+	invisibility_cloak.style.margin = 'auto';
+	
 	
 	let deleteButton = document.createElement('div');
 	deleteButton.style.backgroundColor = '#ff0000';
@@ -569,6 +611,8 @@ function createChannel(){
 	deleteButton.style.border = '1px solid black';
 	deleteButton.style.borderRadius = '10% 40%';
 	deleteButton.style.margin = '2px 2px 2px 2px';
+	deleteButton.addEventListener("touchstart", function(){hasTouched=true;console.log(channel.id+'del');deleteThis(channel);}, false);
+	deleteButton.addEventListener("mousedown", function(){if(!(hasTouched)){console.log(channel.id+'del');deleteThis(channel);}}, false);
 	
 	
 	let channelName = document.createElement('div');
@@ -582,12 +626,29 @@ function createChannel(){
 	banner.appendChild(minButton);
 	banner.appendChild(deleteButton);
 	
+	invisibility_cloak.appendChild(body);
+	
 	channel.appendChild(banner);
-	channel.appendChild(body);
+	channel.appendChild(invisibility_cloak);
 	
 	//might cause issues assigning variables...
 	channel_history.set(channel, {label: channelName.id, volume: volume.value, synth_bool: false, soundfile:variable_select.value, synth: null});
 	document.getElementById("toybox2").appendChild(channel);
+	
+	for (c in all_buttons){
+		if (!(all_buttons[c] === null)){
+			buildSelectOptions(document.getElementById(all_buttons[c].id+'ch'), all_channels);
+		}
+	}
+}
+
+function minimize(thing){
+	/* still in beta
+	console.log(`minimizing ${document.getElementById(thing.id+'i')}...`);
+	let stat = document.getElementById(thing.id+'i').style.display;
+	if (stat== ''){console.log('here');document.getElementById(thing.id+'i').style.display='none';}
+	else if (stat == 'none') {console.log('there');document.getElementById(thing.id+'i').style.display='';}
+	*/
 }
 
 function createSynth (){
@@ -744,6 +805,8 @@ function createSynth (){
 	deleteButton.style.border = '1px solid black';
 	deleteButton.style.borderRadius = '10% 40%';
 	deleteButton.style.margin = '2px 2px 2px 2px';
+	deleteButton.addEventListener("touchstart", function(){hasTouched=true;console.log(synth.id+'del');deleteThis(synth);}, false);
+	deleteButton.addEventListener("mousedown", function(){if(!(hasTouched)){console.log(synth.id+'del');deleteThis(synth);}}, false);
 	
 	let synthName = document.createElement('div');
 	synthName.id = synth.id + 'n'
