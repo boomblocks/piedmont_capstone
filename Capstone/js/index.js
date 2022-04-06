@@ -4,7 +4,7 @@ var colors = {'A':(360/7), 'B':(360/7) * 2, 'C':(360/7) * 3, 'D':(360/7) * 4, 'E
 var all_buttons = [null];
 var all_channels = [null];
 var all_synths = [null];
-var button_history = new Map(); // elements are map.get(button) = {color; channel; quiet_bool}
+var button_history = new Map(); // elements are map.get(button) = {color; channel; quiet_bool; current_context}
 var channel_history = new Map(); //elements are map.get(channel)= {label; volume; synth_bool; soundfile(null); synth(null)}
 var synth_history = new Map(); //elements are map.get(synth)= {volume; wave-shape; frequency}
 var increment = 0;
@@ -69,7 +69,7 @@ function createButton(){
 	let array_position = NextNull(all_buttons);
 	button.id = "button"+array_position.toString();
 	all_buttons[array_position] = button;
-	button_history.set(button, {color:`hsl(${colors['A']}, 100%, 50%)`, channel: null, quiet_bool: false});
+	button_history.set(button, {color:`hsl(${colors['A']}, 100%, 50%)`, channel: null, quiet_bool: false, current_context:null});
 	//button.style = `background-color:${color}; height: 125px; width:125px; border:1px solid black`;
 	bs.backgroundColor = `hsl(${colors['A']}, 100%, 50%)`;
 	bs.height = '120px';
@@ -80,8 +80,29 @@ function createButton(){
 	bs.margin = '5px 5px 5px 5px';
 	bs.overflow = 'hidden';
 	bs.float = 'left';
-	button.addEventListener("touchstart", function(){hasTouched=true;console.log(button.id);Play(button);}, false);
-	button.addEventListener("mousedown", function(){if(!(hasTouched)){console.log(button.id);Play(button);}}, false);
+	button.addEventListener("touchstart", function(){hasTouched=true;Play(button);}, false);
+	button.addEventListener("mousedown", function(){if(!(hasTouched)){Play(button);}}, false);
+	button.addEventListener("touchend", function(){
+		hasTouched=true;
+		console.log('touchend!');
+		if (!(button_history.get(button)['current_context']===null)){
+			//end current context here!
+			button_history.set(button, {color:button_history.get(button)['color'],
+									channel:button_history.get(button)['channel'],
+									quiet_bool:button_history.get(button)['quiet_bool'],
+									current_context:null});
+		}
+		}, false);
+	button.addEventListener("mouseup", function(){if(!(hasTouched)){
+		console.log('mouseup!');
+		if (!(button_history.get(button)['current_context']===null)){
+			//end current context here!
+			button_history.set(button, {color:button_history.get(button)['color'],
+									channel:button_history.get(button)['channel'],
+									quiet_bool:button_history.get(button)['quiet_bool'],
+									current_context:null});
+		}
+		}}, false);
 	//button.addEventListener("touchstart", function () {Play(button)}, false);
 	//button.addEventListener('mousedown', function () {Play(button)}, false);
 	
@@ -166,7 +187,7 @@ function createButton(){
 	
 	color_select.style.margin = 'auto';
 	color_select.addEventListener("change", function() {console.log('color_changed!');
-		button_history.set(button, {color:color_select.value, channel: button_history.get(button)['channel'], quiet_bool:button_history.get(button)['quiet_bool']});
+		button_history.set(button, {color:color_select.value, channel: button_history.get(button)['channel'], quiet_bool:button_history.get(button)['quiet_bool'],current_context:button_history.get(button)['current_context']});
 		button.style.backgroundColor = button_history.get(button)['color'];}, false);
 	top_right.appendChild(color_select);
 	
@@ -180,7 +201,6 @@ function createButton(){
 	let channel_select = document.createElement('select');
 	channel_select.id = button.id + "ch";
 	//let channel = button_history.get(button)['channel'];
-	channel_select.value = 'none';
 	channel_select.style.margin = 'auto';
 	//channel_select.addEventListener("change", function() {console.log('channel_changed!');
 	//	button_history.set(button, {color:color_select.value, channel: button_history.get(button)['channel'], quiet_bool:true});}, false);
@@ -192,6 +212,13 @@ function createButton(){
 	channel_label.innerHTML = 'Channel:'
 	channel_label.style.margin = 'auto';
 	bottom_left.appendChild(channel_label);
+	
+	channel_select.addEventListener('input', function(){
+		button_history.set(button, {color:button_history.get(button)['color'],
+									channel:document.getElementById(channel_select.value),
+									quiet_bool:button_history.get(button)['quiet_bool'],
+									current_context:button_history.get(button)['current_context']});
+	}, false);
 	
 	//EXIT BUTTON
 	let exit = document.createElement('div');
@@ -254,7 +281,7 @@ function createButton(){
 	edit_button.addEventListener("mousedown", function(){if(!(hasTouched)){console.log('this'); editMenu(button,true);}}, false);
 	
 	button.appendChild(edit_button);
-	button_history.set(button, {color:`hsl(${colors['A']}, 100%, 50%)`, channel: channel_select.value, quiet_bool: false});
+	button_history.set(button, {color:`hsl(${colors['A']}, 100%, 50%)`, channel: null, quiet_bool: false, current_context:null});
 	
 	document.getElementById('toybox1').appendChild(button);
 }
@@ -273,19 +300,38 @@ function deleteThis(thing){
 		for (c in all_buttons){
 			if (!(all_buttons[c] === null)){
 				buildSelectOptions(document.getElementById(all_buttons[c].id+'ch'), all_channels);
-				if (handler = button_history.get(all_buttons[c])['channel']){
+				if (handler == button_history.get(all_buttons[c])['channel']){
 					console.log('your channel is dead bro');
 					button_history.set(all_buttons[c], {color:button_history.get(all_buttons[c])['color'],
-									channel:document.getElementById(all_buttons[c].id+'ch').value,
-									quiet_bool:button_history.get(all_buttons[c])});
-					//selected channel needs to reflect truth...
+									channel:null,
+									quiet_bool:button_history.get(all_buttons[c])['quiet_bool'],
+									current_context:button_history.get(all_buttons[c])['current_context']});
+					//selected channel needs to reflect truth...might not!
 				}
 			}
 		}
 	} else if (is_synth){
+		let handler = all_synths[all_synths.indexOf(thing)];
 		all_synths[all_synths.indexOf(thing)] = null;
 		//UPDATE SYNTH OPTIONS FOR ALL CHANNELS
 		//error handle here
+		for (c in all_channels){
+			if (!(all_channels[c] === null)){
+				if (channel_history.get(all_channels[c])['synth_bool']){
+					buildSelectOptions(document.getElementById(all_channels[c].id+'s'), all_synths);
+					if (handler == channel_history.get(all_channels[c])['synth']){
+						console.log('your synth is dead bro');
+						channel_history.set(all_channels[c], {label:channel_history.get(all_channels[c])['label'],
+										volume:channel_history.get(all_channels[c])['volume'],
+										synth_bool:channel_history.get(all_channels[c])['synth_bool'],
+										soundfile: channel_history.get(all_channels[c])['soundfile'],
+										synth:null
+						//selected synth needs to reflect truth...might not!
+						});	
+					}
+				}
+			}
+		}
 	}
 	thing.parentNode.removeChild(thing);
 }
@@ -296,13 +342,15 @@ function editMenu(button, bool){
 	if (bool){
 		button_history.set(button, {color:button_history.get(button)['color'],
 									channel:button_history.get(button)['channel'],
-									quiet_bool:true});
+									quiet_bool:true,
+									current_context:button_history.get(button)['current_context']});
 		document.getElementById(button.id+'e').style.display = 'none';
 		document.getElementById(button.id+'cloak').style.display = 'inline-block';
 	} else {
 		button_history.set(button, {color:button_history.get(button)['color'],
 									channel:button_history.get(button)['channel'],
-									quiet_bool:false});
+									quiet_bool:false,
+									current_context:button_history.get(button)['current_context']});
 		document.getElementById(button.id+'e').style.display = '';
 		document.getElementById(button.id+'cloak').style.display = 'none';
 	}
@@ -314,7 +362,7 @@ function editMenu_VER_0(button){
 	button.style.backgroundColor = 'grey';
 	let color = button_history.get(button)['color'];
 	let channel = button_history.get(button)['channel'];
-	button_history.set(button, {color: color, channel: channel, quiet_bool: true});
+	button_history.set(button, {color: color, channel: channel, quiet_bool: true, current_context:button_history.get(button)['current_context']});
 	
 	//make delete button
 	let delete_button = document.createElement('div');
@@ -430,10 +478,12 @@ function shuffle_colors(){
 function buildSelectOptions(select_object, array){//MAYBE DOESNT WORK
 	//take an array of strings, possibly nulls,
 	//and fill out option values painstakingly.
-	let result = '';
+	let result = `<option value="null">${null}</option>`;
 	for (c in array){
-		if (!(array[c] === null)){
+		if (array == soundfile){
 			result += `<option value="${array[c]}">${array[c]}</option>`;
+		} else if (!(array[c] === null)){
+			result += `<option value="${array[c].id}">${array[c].id}</option>`;
 		}
 	}
 	select_object.innerHTML = result;
@@ -530,7 +580,62 @@ function createChannel(){
 	left_column_top_right.appendChild(radio_2);
 	left_column_top_right.appendChild(radio_2_label);
 	
-	//NEED LISTENER EVENTS FOR RADIO BUTTONS
+	//LISTENER EVENTS FOR RADIO BUTTONS
+	radio_1.addEventListener("touchstart", function(){
+		hasTouched=true;
+		console.log(radio_1.id);
+		buildSelectOptions(document.getElementById(channel.id+'s'),all_synths);
+		channel_history.set(channel, 
+			{label:channel_history.get(channel)['label'],
+				volume:channel_history.get(channel)['volume'],
+				synth_bool:true,
+				soundfile: null,
+				synth:document.getElementById(document.getElementById(channel.id+'s').value)});
+	}, false);
+	radio_1.addEventListener("mousedown", function(){
+		if(!(hasTouched)){
+			console.log(radio_1.id);
+			buildSelectOptions(document.getElementById(channel.id+'s'),all_synths);
+			channel_history.set(channel, 
+				{label:channel_history.get(channel)['label'],
+					volume:channel_history.get(channel)['volume'],
+					synth_bool:true,
+					soundfile: null,
+					synth:document.getElementById(document.getElementById(channel.id+'s').value)});
+		}
+	}, false);
+	
+	radio_2.addEventListener("touchstart", function(){
+		hasTouched=true;
+		console.log(radio_2.id);
+			buildSelectOptions(document.getElementById(channel.id+'s'),soundfile);
+			channel_history.set(channel, 
+				{label:channel_history.get(channel)['label'],
+					volume:channel_history.get(channel)['volume'],
+					synth_bool:false,
+					soundfile:document.getElementById(channel.id+'s').value,
+					synth:null});
+			//updating all buttons with this channel
+			for (c in all_buttons){
+				if (button_history.get(all_buttons[c])['channel']==channel){
+					button_history.set(all_buttons[c], {color:button_history.get(all_buttons[c])['color'],
+									channel:channel,
+									quiet_bool:button_history.get(all_buttons[c])['quiet_bool'],
+									current_context:button_history.get(all_buttons[c])['current_context']});
+				}
+			}
+	}, false);
+	radio_2.addEventListener("mousedown", function(){if(!(hasTouched)){
+		console.log(radio_2.id);
+		console.log(radio_2.id);
+		buildSelectOptions(document.getElementById(channel.id+'s'),soundfile);
+		channel_history.set(channel, 
+			{label:channel_history.get(channel)['label'],
+				volume:channel_history.get(channel)['volume'],
+				synth_bool:false,
+				soundfile:document.getElementById(channel.id+'s').value,
+				synth:null});
+	}}, false);
 	
 	left_column_top_left.style.flex = '1';
 	left_column_top_right.style.flex = '1';
@@ -550,6 +655,15 @@ function createChannel(){
 	volume_label.innerHTML = 'Volume:'
 	
 	//NEED LISTENER EVENTS FOR VOLUME
+	volume.addEventListener('input', function(){
+		console.log(`volume=${volume.value}`);
+		channel_history.set(channel, 
+			{label:channel_history.get(channel)['label'],
+				volume:volume.value,
+				synth_bool:channel_history.get(channel)['synth_bool'],
+				soundfile:channel_history.get(channel)['soundfile'],
+				synth:channel_history.get(channel)['synth']});
+	}, false);
 	volume.style.flex = '2';
 	volume.style.margin = 'auto';
 	volume_label.style.flex = '5';
@@ -567,6 +681,26 @@ function createChannel(){
 	buildSelectOptions(variable_select, soundfile);
 	
 	//NEED LISTENER EVENTS FOR SELECT OBJECT
+	variable_select.addEventListener('input', function(){
+		if (channel_history.get(channel)['synth_bool']){
+			console.log('handle synth');
+		} else {
+			channel_history.set(channel, 
+				{label:channel_history.get(channel)['label'],
+					volume:channel_history.get(channel)['volume'],
+					synth_bool:false,
+					soundfile:document.getElementById(channel.id+'s').value,
+					synth:null});
+		}
+		for (c in all_buttons){
+				if (button_history.get(all_buttons[c])['channel']==channel){
+					button_history.set(all_buttons[c], {color:button_history.get(all_buttons[c])['color'],
+									channel:channel,
+									quiet_bool:button_history.get(all_buttons[c])['quiet_bool'],
+									current_context:button_history.get(all_buttons[c])['current_context']});
+				}
+			}
+	}, false);
 	
 	right_column.appendChild(variable_select);
 	
@@ -959,3 +1093,177 @@ function createSynth (){
 	//HANDLE SYNTH HISTORY HERE
 	document.getElementById('toybox3').appendChild(synth);
 }
+
+//down here, at the bottom of this world, we shall forge a paradise
+//BUT BEFORE WE START, some context.
+/*
+the document above has buttons. the button will run a function when clicked, and call on a channel.
+
+the channel when called on will provide volume and EITHER a soundfile, OR a synth.
+
+the synth when called on will provide volume, a waveform, and frequency.
+
+look into managing button presses with MOUSEUP and TOUCHEND events...
+
+DONE! buttons all now have MOUSEUP/TOUCHEND event handlers with a current_context in their histories.
+
+/////
+button_history.set(button, {color:button_history.get(button)['color'],
+									channel:button_history.get(button)['channel'],
+									quiet_bool:button_history.get(button)['quiet_bool'],
+									current_context:null});
+\\\\\
+*/
+/*
+let audioContext = new (window.AudioContext || window.webkitAudioContext)();
+let oscList = [];
+let mainGainNode = null;
+
+let keyboard = document.querySelector(".keyboard"); //still useful?
+let wavePicker = document.querySelector("select[name='waveform']"); //from synth?
+let volumeControl = document.querySelector("input[name='volume']"); //can we make this from synth?
+
+let noteFreq = null; //fine
+let customWaveform = null; //useless!(?)
+let sineTerms = null;
+let cosineTerms = null;
+
+function createNoteTable() {
+	let noteFreq = [];
+	for (let i=0; i< 9; i++) {
+		noteFreq[i] = [];
+	}
+	
+	let noteNames = ['A', 'A#', 'B', 'C', 'C#',
+	'D', 'D#', 'E', 'F', 'F#', 'G', 'G#'];
+	var prev_frequency = 25.95654359874657;
+	for (const x in noteFreq) {
+		for (const y in noteNames){
+			var freqValue = prev_frequency * (2**(1/12));
+			prev_frequency = freqValue;
+			noteFreq[x][noteNames[y]] = freqValue;
+		}
+	}
+	return noteFreq
+}
+
+function setup() {
+	noteFreq = createNoteTable();
+	
+	volumeControl.addEventListener("change", changeVolume, false);
+	
+	mainGainNode = audioContext.createGain();
+	mainGainNode.connect(audioContext.destination);
+	mainGainNode.gain.value = volumeControl.value;
+	
+	//Create the keys, separate into octave divs
+	noteFreq.forEach(function(keys, idx) {
+		let keyList = Object.entries(keys);
+		let octaveElem = document.createElement("div");
+		octaveElem.className = "octave";
+		
+		keyList.forEach(function(key) {
+			if (key[0].length == 1) {
+				octaveElem.appendChild(createKey(key[0], idx, key[1]));
+			}
+		});
+		keyboard.appendChild(octaveElem);
+	});
+	document.querySelector("div[data-note='B'][data-octave='5']").scrollIntoView(false);
+	sineTerms = new Float32Array([0, 0, 1, 0, 1]);
+	cosineTerms = new Float32Array(sineTerms.length);
+	customWaveform = audioContext.createPeriodicWave(cosineTerms, sineTerms);
+	for (i=0; i<9; i++) {
+		oscList[i] = {};
+	}
+}
+function createKey(note, octave, freq) {
+  let keyElement = document.createElement("div");
+  let labelElement = document.createElement("div");
+
+  keyElement.className = "key";
+  keyElement.dataset["octave"] = octave;
+  keyElement.dataset["note"] = note;
+  keyElement.dataset["frequency"] = freq;
+
+  labelElement.innerHTML = '';//note + "<sub>" + octave + "</sub>"
+  keyElement.appendChild(labelElement);
+  keyElement.id = String(note) + String(octave);//`${note}${octave}`
+  keyElement.addEventListener("mousedown", notePressed, false);
+  keyElement.addEventListener("mouseup", noteReleased, false);
+  keyElement.addEventListener("mouseover", notePressed, false);
+  keyElement.addEventListener("mouseleave", noteReleased, false);
+  keyElement.addEventListener("touchstart", touchOn, false);
+  keyElement.addEventListener("touchend", touchOff, false);
+  let value = 0;
+  keyElement.style["background-color"] = `hsl(${Colors[note]}, 100%, 50%)`;
+  return keyElement;
+}
+
+function playTone(freq) {
+  let osc = audioContext.createOscillator();
+  osc.connect(mainGainNode);
+
+  let type = wavePicker.options[wavePicker.selectedIndex].value;
+
+  if (type == "custom") {
+	osc.setPeriodicWave(customWaveform);
+  } else {
+	osc.type = type;
+  }
+
+  osc.frequency.value = freq;
+  osc.start();
+
+  return osc;
+}
+
+function notePressed(event) {
+  if (event.buttons & 1) {
+	let dataset = event.target.dataset;
+
+	if (!dataset["pressed"]) {
+	  let octave = +dataset["octave"];
+	  oscList[octave][dataset["note"]] = playTone(dataset["frequency"]);
+	  dataset["pressed"] = "yes";
+	}
+  }
+}
+
+function changeVolume(event) {
+  mainGainNode.gain.value = volumeControl.value
+}
+
+function noteReleased(event) {
+  let dataset = event.target.dataset;
+
+  if (dataset && dataset["pressed"]) {
+	let octave = +dataset["octave"];
+	oscList[octave][dataset["note"]].stop();
+	delete oscList[octave][dataset["note"]];
+	delete dataset["pressed"];
+  }
+}
+
+function touchOn(event) {
+	let dataset = event.target.dataset;
+
+	if (!dataset["pressed"]) {
+		let octave = +dataset["octave"];
+		oscList[octave][dataset["note"]] = playTone(dataset["frequency"]);
+		dataset["pressed"] = "yes";
+	}
+}
+
+function touchOff(event){		
+	let dataset = event.target.dataset;
+
+	if (dataset && dataset["pressed"]) {
+		let octave = +dataset["octave"];
+		oscList[octave][dataset["note"]].stop();
+		delete oscList[octave][dataset["note"]];
+		delete dataset["pressed"];
+	}
+}
+setup();
+*/
