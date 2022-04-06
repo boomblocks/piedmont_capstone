@@ -1,3 +1,11 @@
+#add {
+	height: 25px;
+	width: 25px;
+	margin:auto;
+	border: medium dashed green;
+	background-color: hsl(127, 100%, 30%);
+}
+
 #toybox1 {
 	border: solid;
 	overflow: auto;

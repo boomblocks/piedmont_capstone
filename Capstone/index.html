@@ -11,6 +11,16 @@
 			//initial styling
 			document.body.style.backgroundColor = '#f0f0f0';
 		</script>
+		<div style="margin:auto; display: block; border:1px solid black; text-align:center">
+			<h1>Sound Synthesis</h1>
+			<p>Welcome to my webpage!</p>
+			<p>Below, you can make buttons, channels, and synths with the green button. Open a button's edit menu to select a channel.
+			</p><p>In the channel selected, choose to either process soundfiles or synths, then select the location of the sound.</p>
+			<p>In the case of playing a synth, customize the synth accordingly, and then mash your associated button!</p>
+			
+		</div>
+		<div style="margin:auto; display: block; border:1px solid black">
+		<div id='add'div></div>
 		<div id="toybox1">
 		</div>
 		<div id="container">
@@ -19,9 +29,13 @@
 			<div id="toybox3">
 			</div>
 		</div>
+		</div>
 		<script>
 			//TEMPORARY
-			for (let i=0;i!=6;i++){Test();}
+			//for (let i=0;i!=6;i++){Test();}
+			document.getElementById('add').addEventListener("touchstart", function(){hasTouched=true;Test();}, false);
+			document.getElementById('add').addEventListener("mousedown", function(){if(!(hasTouched)){console.log('.'),Test();}}, false);
+
 		
 			function lava(){
 				if (!(TestClicked)){
