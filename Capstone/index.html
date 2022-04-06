@@ -59,8 +59,7 @@
 						if (channel_history.get(chan)['synth_bool']){
 							console.log('handling a synth...')
 							//update button history for current_context
-							
-							
+							playSynth(synth_history.get(document.getElementById(channel_history.get(chan)['synth'])), button);							
 						} else {
 							if ((!(channel_history.get(chan)['soundfile']==null))&&(!(channel_history.get(chan)['soundfile']=='null'))){
 								let sound = new Audio(channel_history.get(chan)['soundfile']);

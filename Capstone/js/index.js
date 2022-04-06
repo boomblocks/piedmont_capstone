@@ -135,6 +135,7 @@ function createButton(){
 		console.log('touchend!');
 		if (!(button_history.get(button)['current_context']===null)){
 			//end current context here!
+			button_history.get(button)['current_context'].stop()
 			button_history.set(button, {color:button_history.get(button)['color'],
 									channel:button_history.get(button)['channel'],
 									quiet_bool:button_history.get(button)['quiet_bool'],
@@ -145,6 +146,7 @@ function createButton(){
 		console.log('mouseup!');
 		if (!(button_history.get(button)['current_context']===null)){
 			//end current context here!
+			button_history.get(button)['current_context'].stop()
 			button_history.set(button, {color:button_history.get(button)['color'],
 									channel:button_history.get(button)['channel'],
 									quiet_bool:button_history.get(button)['quiet_bool'],
@@ -1250,15 +1252,40 @@ button_history.set(button, {color:button_history.get(button)['color'],
 \\\\\
 */
 ///*
-//let audioContext = new (window.AudioContext || window.webkitAudioContext)();
+let audioContext = new (window.AudioContext || window.webkitAudioContext)();
 //let oscList = [];
-//let mainGainNode = null;
+let mainGainNode = null;
+mainGainNode = audioContext.createGain();
+mainGainNode.connect(audioContext.destination);
 
 //let keyboard = document.querySelector(".keyboard"); //still useful?
 //let wavePicker = document.querySelector("select[name='waveform']"); //from synth?
 //let volumeControl = document.querySelector("input[name='volume']"); //can we make this from synth?
 //let sineTerms = null;
 //let cosineTerms = null;
+
+function playSynth(synthHist, button){
+	console.log(synthHist);
+		
+	let osc = audioContext.createOscillator();
+	osc.connect(mainGainNode);
+
+	//let type = wavePicker.options[wavePicker.selectedIndex].value;
+
+	osc.type = synthHist['wave_shape'];
+	
+	osc.frequency.value = freq_values[synthHist['frequency']];
+
+	button_history.set(button,
+		{color:button_history.get(button)['color'],
+		channel:button_history.get(button)['channel'],
+		quiet_bool:button_history.get(button)['quiet_bool'],
+		current_context: osc});
+
+	mainGainNode.gain.value = synthHist['volume'];
+	
+	osc.start();
+}
 
 function setup() {
 	noteFreq = createNoteTable('dont');
@@ -1315,7 +1342,7 @@ function createKey(note, octave, freq) {//parameters all come from frequency sel
   return keyElement;
 }
 
-function playTone(freq) {
+function playTone(freq) {//worked
   let osc = audioContext.createOscillator();
   osc.connect(mainGainNode);
 
@@ -1343,10 +1370,6 @@ function notePressed(event) {
 	  dataset["pressed"] = "yes";
 	}
   }
-}
-
-function changeVolume(event) {
-  mainGainNode.gain.value = volumeControl.value
 }
 
 function noteReleased(event) {
