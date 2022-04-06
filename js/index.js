@@ -110,6 +110,9 @@ function divEventBundle(some_element){
 	some_element.addEventListener("mousedown", function(){if(!(hasTouched)){console.log('this');}}, false);
 	*/
 };
+document.getElementById('add').addEventListener("touchstart", function(){hasTouched=true;Test();}, false);
+document.getElementById('add').addEventListener("mousedown", function(){if(!(hasTouched)){console.log('.'),Test();}}, false);
+	
 
 function createButton(){
 	let button = document.createElement('div');
