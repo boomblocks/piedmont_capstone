@@ -54,12 +54,11 @@
 			function Play(button){
 				if (!(button_history.get(button)['quiet_bool'])){
 					let chan = button_history.get(button)['channel'];
-					console.log(channel_history.get(chan));
 					if (chan){
 						if (channel_history.get(chan)['synth_bool']){
 							console.log('handling a synth...')
 							//update button history for current_context
-							playSynth(synth_history.get(document.getElementById(channel_history.get(chan)['synth'])), button);							
+							playSynth(document.getElementById(channel_history.get(chan)['synth']), button);							
 						} else {
 							if ((!(channel_history.get(chan)['soundfile']==null))&&(!(channel_history.get(chan)['soundfile']=='null'))){
 								let sound = new Audio(channel_history.get(chan)['soundfile']);
@@ -70,6 +69,34 @@
 					}
 				}
 			}
+		</script>
+		<script>
+		/*
+			function synth_enviro(synth, button){
+				function playSynth(synth, button){
+					var audioContext = new (window.AudioContext || window.webkitAudioContext)();
+					
+					var mainGainNode = audioContext.createGain();
+					mainGainNode.connect(audioContext.destination);
+					mainGainNode.gain.value = synthHist['volume'];
+					
+					let osc = audioContext.createOscillator();
+					osc.connect(mainGainNode);
+
+					let type = synthHist['wave_shape'];
+					osc.type = type;
+					osc.frequency.value = freq_values[synthHist['frequency']];
+					osc.start();
+
+					button_history.set(button,
+						{color:button_history.get(button)['color'],
+						channel:button_history.get(button)['channel'],
+						quiet_bool:button_history.get(button)['quiet_bool'],
+						current_context: osc});	
+					
+				}
+				playSynth(synthHist, button);
+			}*/
 		</script>
 	</body>
 </html>
