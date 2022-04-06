@@ -6,7 +6,7 @@ var all_channels = [null];
 var all_synths = [null];
 var button_history = new Map(); // elements are map.get(button) = {color; channel; quiet_bool; current_context}
 var channel_history = new Map(); //elements are map.get(channel)= {label; volume; synth_bool; soundfile(null); synth(null)}
-var synth_history = new Map(); //elements are map.get(synth)= {volume; wave-shape; frequency}
+var synth_history = new Map(); //elements are map.get(synth)= {volume; wave_shape; frequency}
 var increment = 0;
 var hasTouched = false;
 var	soundfile = ["./audio/Am_Chord_1.wav",
@@ -29,8 +29,56 @@ var	soundfile = ["./audio/Am_Chord_1.wav",
 		"./audio/Ahh!_1.wav"];
 //let sound = new Audio("soundfile.wav");
 //sound.play();
+let noteFreq = null;
+function createNoteTable(string) {
+	let noteFreq = [];
+	for (let i=0; i< 9; i++) {
+		noteFreq[i] = [];
+	}
+	
+	let noteNames = ['A', 'A#', 'B', 'C', 'C#',
+	'D', 'D#', 'E', 'F', 'F#', 'G', 'G#'];
+	var prev_frequency = 25.95654359874657;
+	if (string == 'use_1'){
+		let freq_names = [];
+		let a = '012345678';
+		for (const x in a) {
+			for (const y in noteNames){
+				freq_names.push(`${noteNames[y]}${a[x]}`);
+			}
+		}
+		return freq_names;
+	} else if (string == 'use_2'){
+		let freq_names = [];
+		let a = '012345678';
+		for (const x in a) {
+			for (const y in noteNames){
+				freq_names.push(`${noteNames[y]}${a[x]}`);
+			}
+		}
+		let freq_values = [];
+		for (c in freq_names){
+			var freqValue = prev_frequency * (2**(1/12));
+				prev_frequency = freqValue;
+				freq_values[freq_names[c]] = freqValue;
+		}
+		return freq_values;
+	} else {
+		for (const x in noteFreq) {
+			for (const y in noteNames){
+				var freqValue = prev_frequency * (2**(1/12));
+				prev_frequency = freqValue;
+				noteFreq[x][noteNames[y]] = freqValue;
+			}
+		}
+	}
+	return noteFreq;
+}
+var freq_names = createNoteTable('use_1');
+var freq_values = createNoteTable('use_2');
 
-
+//console.log(freq_names);
+//console.log(freq_values);
 
 function Test(){
 	createButton();
@@ -480,7 +528,7 @@ function buildSelectOptions(select_object, array){//MAYBE DOESNT WORK
 	//and fill out option values painstakingly.
 	let result = `<option value="null">${null}</option>`;
 	for (c in array){
-		if (array == soundfile){
+		if ((array == soundfile)||(array == freq_names)){
 			result += `<option value="${array[c]}">${array[c]}</option>`;
 		} else if (!(array[c] === null)){
 			result += `<option value="${array[c].id}">${array[c].id}</option>`;
@@ -684,6 +732,12 @@ function createChannel(){
 	variable_select.addEventListener('input', function(){
 		if (channel_history.get(channel)['synth_bool']){
 			console.log('handle synth');
+			channel_history.set(channel,
+			{label:channel_history.get(channel)['label'],
+			volume:channel_history.get(channel)['volume'],
+			synth_bool:true,
+			soundfile:null,
+			synth:variable_select.value});
 		} else {
 			channel_history.set(channel, 
 				{label:channel_history.get(channel)['label'],
@@ -693,7 +747,7 @@ function createChannel(){
 					synth:null});
 		}
 		for (c in all_buttons){
-				if (button_history.get(all_buttons[c])['channel']==channel){
+				if (button_history.get(all_buttons[c])['channel']==channel.id){
 					button_history.set(all_buttons[c], {color:button_history.get(all_buttons[c])['color'],
 									channel:channel,
 									quiet_bool:button_history.get(all_buttons[c])['quiet_bool'],
@@ -959,7 +1013,22 @@ function createSynth (){
 	freq_select.id = synth.id + 's'
 	freq_select.name = synth.id + 'select';
 	freq_select.margin = 'auto';
-	buildSelectOptions(freq_select, ['A','B','C']);
+	buildSelectOptions(freq_select, freq_names);
+	freq_select.addEventListener('input', function(){
+		//update synth and channel history here
+		synth_history.set(synth, {volume:synth_history.get(synth)['volume'], wave_shape:synth_history.get(synth)['wave_shape'], frequency:freq_select.value});
+		for (c in all_channels){
+			if (channel_history.get(all_channels[c])['synth_bool']){
+				if (channel_history.get(all_channels[c])['synth'] == synth.id){
+				channel_history.set(all_channels[c], {label:channel_history.get(all_channels[c])['label'],
+					volume:channel_history.get(all_channels[c])['volume'],
+					synth_bool:channel_history.get(all_channels[c])['synth_bool'],
+					soundfile: channel_history.get(all_channels[c])['soundfile'],
+					synth:synth.id});	
+				}
+			}
+		}
+	}, false);
 	
 	let freq_label = document.createElement('label');
 	freq_label.for = freq_select.name;
@@ -978,6 +1047,11 @@ function createSynth (){
 	volume.value = '100';
 	volume.name = synth.id + 'vname';
 	volume.style.margin = 'auto';
+	volume.addEventListener('input', function(){
+		synth_history.set(synth, {volume:volume.value,
+			wave_shape:synth_history.get(synth)['wave_shape'],
+		frequency: synth_history.get(synth)['frequency']});
+	},false);
 	
 	let volume_label = document.createElement('label');
 	volume_label.for = volume.name;
@@ -1057,6 +1131,67 @@ function createSynth (){
 	
 	right_column_bottom_right_right.appendChild(tri_label);
 	
+	//RADIO LISTEN EVENTS
+	sine_radio.addEventListener('input', function(){
+		synth_history.set(synth, {volume:synth_history.get(synth)['volume'], wave_shape:'sine', frequency:synth_history.get(synth)['frequency']});
+		for (c in all_channels){
+			if (channel_history.get(all_channels[c])['synth_bool']){
+				if (channel_history.get(all_channels[c])['synth'] == synth.id){
+				channel_history.set(all_channels[c], {label:channel_history.get(all_channels[c])['label'],
+					volume:channel_history.get(all_channels[c])['volume'],
+					synth_bool:channel_history.get(all_channels[c])['synth_bool'],
+					soundfile: channel_history.get(all_channels[c])['soundfile'],
+					synth:synth.id});	
+				}
+			}
+		}
+	}, false);
+	square_radio.addEventListener('input', function(){
+		synth_history.set(synth, {volume:synth_history.get(synth)['volume'], wave_shape:'square', frequency:synth_history.get(synth)['frequency']});
+		for (c in all_channels){
+			if (channel_history.get(all_channels[c])['synth_bool']){
+				if (channel_history.get(all_channels[c])['synth'] == synth.id){
+					console.log('square checkin');
+				channel_history.set(all_channels[c], {label:channel_history.get(all_channels[c])['label'],
+					volume:channel_history.get(all_channels[c])['volume'],
+					synth_bool:channel_history.get(all_channels[c])['synth_bool'],
+					soundfile: channel_history.get(all_channels[c])['soundfile'],
+					synth:synth.id});	
+				}
+			}
+		}
+	}, false);
+	saw_radio.addEventListener('input', function(){
+		synth_history.set(synth, {volume:synth_history.get(synth)['volume'], wave_shape:'saw', frequency:synth_history.get(synth)['frequency']});
+		for (c in all_channels){
+			if (channel_history.get(all_channels[c])['synth_bool']){
+				if (channel_history.get(all_channels[c])['synth'] == synth.id){
+				channel_history.set(all_channels[c], {label:channel_history.get(all_channels[c])['label'],
+					volume:channel_history.get(all_channels[c])['volume'],
+					synth_bool:channel_history.get(all_channels[c])['synth_bool'],
+					soundfile: channel_history.get(all_channels[c])['soundfile'],
+					synth:synth.id});	
+				}
+			}
+		}
+	}, false);
+	tri_radio.addEventListener('input', function(){
+		//update synth history and update channel history
+		synth_history.set(synth, {volume:synth_history.get(synth)['volume'], wave_shape:'triangle', frequency:synth_history.get(synth)['frequency']});
+		for (c in all_channels){
+			if (channel_history.get(all_channels[c])['synth_bool']){
+				if (channel_history.get(all_channels[c])['synth'] == synth.id){
+				channel_history.set(all_channels[c], {label:channel_history.get(all_channels[c])['label'],
+					volume:channel_history.get(all_channels[c])['volume'],
+					synth_bool:channel_history.get(all_channels[c])['synth_bool'],
+					soundfile: channel_history.get(all_channels[c])['soundfile'],
+					synth:synth.id});	
+				}
+			}
+		}
+	}, false);
+	
+	
 	//ACTUAL CONSTRUCTION
 	left_column_bottom.appendChild(left_column_bottom_left);
 	left_column_bottom.appendChild(left_column_bottom_right);
@@ -1090,7 +1225,7 @@ function createSynth (){
 	synth.appendChild(banner);
 	synth.appendChild(body);
 	
-	//HANDLE SYNTH HISTORY HERE
+	synth_history.set(synth, {volume:volume.value, wave_shape:'sine', frequency:null});	
 	document.getElementById('toybox3').appendChild(synth);
 }
 
@@ -1114,49 +1249,28 @@ button_history.set(button, {color:button_history.get(button)['color'],
 									current_context:null});
 \\\\\
 */
-/*
-let audioContext = new (window.AudioContext || window.webkitAudioContext)();
-let oscList = [];
-let mainGainNode = null;
+///*
+//let audioContext = new (window.AudioContext || window.webkitAudioContext)();
+//let oscList = [];
+//let mainGainNode = null;
 
-let keyboard = document.querySelector(".keyboard"); //still useful?
-let wavePicker = document.querySelector("select[name='waveform']"); //from synth?
-let volumeControl = document.querySelector("input[name='volume']"); //can we make this from synth?
-
-let noteFreq = null; //fine
-let customWaveform = null; //useless!(?)
-let sineTerms = null;
-let cosineTerms = null;
-
-function createNoteTable() {
-	let noteFreq = [];
-	for (let i=0; i< 9; i++) {
-		noteFreq[i] = [];
-	}
-	
-	let noteNames = ['A', 'A#', 'B', 'C', 'C#',
-	'D', 'D#', 'E', 'F', 'F#', 'G', 'G#'];
-	var prev_frequency = 25.95654359874657;
-	for (const x in noteFreq) {
-		for (const y in noteNames){
-			var freqValue = prev_frequency * (2**(1/12));
-			prev_frequency = freqValue;
-			noteFreq[x][noteNames[y]] = freqValue;
-		}
-	}
-	return noteFreq
-}
+//let keyboard = document.querySelector(".keyboard"); //still useful?
+//let wavePicker = document.querySelector("select[name='waveform']"); //from synth?
+//let volumeControl = document.querySelector("input[name='volume']"); //can we make this from synth?
+//let sineTerms = null;
+//let cosineTerms = null;
 
 function setup() {
-	noteFreq = createNoteTable();
+	noteFreq = createNoteTable('dont');
 	
-	volumeControl.addEventListener("change", changeVolume, false);
+	//volumeControl.addEventListener("change", changeVolume, false);
 	
 	mainGainNode = audioContext.createGain();
 	mainGainNode.connect(audioContext.destination);
 	mainGainNode.gain.value = volumeControl.value;
 	
 	//Create the keys, separate into octave divs
+	/*
 	noteFreq.forEach(function(keys, idx) {
 		let keyList = Object.entries(keys);
 		let octaveElem = document.createElement("div");
@@ -1169,15 +1283,16 @@ function setup() {
 		});
 		keyboard.appendChild(octaveElem);
 	});
-	document.querySelector("div[data-note='B'][data-octave='5']").scrollIntoView(false);
+	*/
+	
+	//document.querySelector("div[data-note='B'][data-octave='5']").scrollIntoView(false);
+	
 	sineTerms = new Float32Array([0, 0, 1, 0, 1]);
 	cosineTerms = new Float32Array(sineTerms.length);
-	customWaveform = audioContext.createPeriodicWave(cosineTerms, sineTerms);
-	for (i=0; i<9; i++) {
-		oscList[i] = {};
-	}
+
 }
-function createKey(note, octave, freq) {
+
+function createKey(note, octave, freq) {//parameters all come from frequency selection in synth
   let keyElement = document.createElement("div");
   let labelElement = document.createElement("div");
 
@@ -1265,5 +1380,4 @@ function touchOff(event){
 		delete dataset["pressed"];
 	}
 }
-setup();
-*/
+//setup();
