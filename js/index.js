@@ -31,6 +31,7 @@ var	soundfile = ["./audio/Am_Chord_1.wav",
 //sound.play();
 let noteFreq = null;
 function createNoteTable(string) {
+	//returns an array of note frequencies or names
 	let noteFreq = [];
 	for (let i=0; i< 9; i++) {
 		noteFreq[i] = [];
@@ -81,6 +82,7 @@ var freq_values = createNoteTable('use_2');
 //console.log(freq_values);
 
 function Test(){
+	//Careful! This is for testing.
 	createButton();
 	createChannel();
 	createSynth();
@@ -89,6 +91,7 @@ function Test(){
 }
 
 function NextNull(array){
+	//either returns the index of the next null in an array, or appends a null and then returns the last index
 	for (i=0;i<array.length;i++){
 		if (array[i] === null){
 			return i;
@@ -98,23 +101,18 @@ function NextNull(array){
 	return array.length-1;
 };
 
-function divEventBundle(some_element){
-	//This is where I will admit...
-	//I am going to handle touch/mouse event problems
-	//with a bool at the top of the javascript.
-	//IF (!(hasTouched)){ run mousedown event}
-	
-	//this isnt so much a function as it is a clipboard...
-	/*
-	some_element.addEventListener("touchstart", function(){hasTouched=true;console.log('this');}, false);
-	some_element.addEventListener("mousedown", function(){if(!(hasTouched)){console.log('this');}}, false);
-	*/
-};
-document.getElementById('add').addEventListener("touchstart", function(){hasTouched=true;Test();}, false);
-document.getElementById('add').addEventListener("mousedown", function(){if(!(hasTouched)){console.log('.'),Test();}}, false);
-	
+//This is where I will admit...
+//I am going to handle touch/mouse event problems
+//with a bool at the top of the javascript.
+//IF (!(hasTouched)){ run mousedown event}
+
+//this isnt so much a function as it is a clipboard...
+
+//some_element.addEventListener("touchstart", function(){hasTouched=true;console.log('this');}, false);
+//some_element.addEventListener("mousedown", function(){if(!(hasTouched)){console.log('this');}}, false);	
 
 function createButton(){
+	//creates buttons!
 	let button = document.createElement('div');
 	let bs = button.style;
 	let array_position = NextNull(all_buttons);
@@ -345,6 +343,7 @@ function createButton(){
 }
 
 function deleteThis(thing){
+	//deletes buttons, channels, and synths
 	let is_button = button_history.delete(thing);
 	let is_channel = channel_history.delete(thing);
 	let is_synth = synth_history.delete(thing);
@@ -395,8 +394,7 @@ function deleteThis(thing){
 }
 
 function editMenu(button, bool){
-	//make quiet, hide edit_button, reveal edit menu
-	//MAKE QUIET
+	//first attempt at an edit menu for buttons
 	if (bool){
 		button_history.set(button, {color:button_history.get(button)['color'],
 									channel:button_history.get(button)['channel'],
@@ -415,7 +413,7 @@ function editMenu(button, bool){
 }
 
 function editMenu_VER_0(button){
-	//make quiet, remove edit_button
+	//second attempt at an edit menu for buttons
 	button.removeChild(document.getElementById(button.id + 'e'));
 	button.style.backgroundColor = 'grey';
 	let color = button_history.get(button)['color'];
@@ -476,6 +474,7 @@ function editMenu_VER_0(button){
 }
 
 function stringToHsl(string){
+	//converts a string into an array containing arguments for an HSL value
 	let array = ['','',''];
 	let i = 0;
 	for (c in string){
@@ -489,6 +488,7 @@ function stringToHsl(string){
 }
 
 function hslToRGB(array) {
+	//Takes hsl values in an array and returns RGB values in an array
 	let h = parseInt(array[0]);
     let s = parseInt(array[1])/100;
     let l = parseInt(array[2])/100;
@@ -515,6 +515,7 @@ function hslToRGB(array) {
 }
 
 function RGBtoHex(array){
+	//takes RGB values in an array and returns a Hex value string
 	let r = array[0].toString(16);
 	let g = array[1].toString(16);
 	let b = array[2].toString(16);
@@ -529,13 +530,13 @@ function RGBtoHex(array){
 }
 
 function shuffle_colors(){
+	//lazy color shuffler
 	colors = {'A':colors["B"], 'B':colors["C"], 'C':colors["D"], 'D':colors["E"],
 		'E':colors["F"], 'F':colors["G"], 'G':colors["A"]};
 }
 
-function buildSelectOptions(select_object, array){//MAYBE DOESNT WORK
-	//take an array of strings, possibly nulls,
-	//and fill out option values painstakingly.
+function buildSelectOptions(select_object, array){
+	//takes an array of strings, possibly nulls, and fill out option values for a select input
 	let result = `<option value="null">${null}</option>`;
 	for (c in array){
 		if ((array == soundfile)||(array == freq_names)){
@@ -548,6 +549,7 @@ function buildSelectOptions(select_object, array){//MAYBE DOESNT WORK
 }
 
 function createChannel(){
+	//creates a channel
 	/*quick note:
 	need to handle channel lists of all current buttons at the end of this function
 	
@@ -841,6 +843,7 @@ function createChannel(){
 }
 
 function minimize(thing){
+	//doesn't work yet
 	/* still in beta
 	console.log(`minimizing ${document.getElementById(thing.id+'i')}...`);
 	let stat = document.getElementById(thing.id+'i').style.display;
@@ -850,7 +853,7 @@ function minimize(thing){
 }
 
 function createSynth (){
-	//lol yeah I am showing I don't understand CSS
+	//creates a synth!
 	//MAIN DIVS
 	let synth = document.createElement('div');
 	let banner = document.createElement('div');
@@ -1274,6 +1277,7 @@ mainGainNode.connect(audioContext.destination);*/
 
 
 function playSynth(synth, button){
+	//plays a synth!
 	var audioContext = new AudioContext();
 	
 	var mainGainNode = audioContext.createGain();
